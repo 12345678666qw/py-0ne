@@ -254,6 +254,27 @@
             margin-top: 10px;
         }
         
+        .config-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f0f0f0;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #2ecc71;
+        }
+        
+        .status-text {
+            font-weight: 500;
+        }
+        
         @media (max-width: 600px) {
             .container, .results-container {
                 border-radius: 15px;
@@ -375,7 +396,11 @@
             </form>
             
             <div class="email-config">
-                <h3><i class="fas fa-cog"></i> 邮件配置说明</h3>
+                <h3><i class="fas fa-cog"></i> 邮件配置状态</h3>
+                <div class="config-status">
+                    <div class="status-indicator" id="configStatus"></div>
+                    <div class="status-text" id="configStatusText">正在检查配置状态...</div>
+                </div>
                 <p>此表单使用EmailJS服务发送邮件到 <strong>blackwhilecolor@Outlook.com</strong>。</p>
                 <p>要使其正常工作，您需要：</p>
                 <ol>
@@ -421,13 +446,27 @@ const EMAILJS_TEMPLATE_ID = '您的Template ID';</pre>
         // 初始化EmailJS
         // 请替换为您的EmailJS配置
         const EMAILJS_PUBLIC_KEY = 'rmpp5KK75q7OQLzmC'; // 替换为您的Public Key
-        const EMAILJS_SERVICE_ID = '4qddlv8'; // 替换为您的Service ID
-        const EMAILJS_TEMPLATE_ID = '7d78p8b'; // 替换为您的Template ID
+        const EMAILJS_SERVICE_ID = 'service_4qddlv8'; // 替换为您的Service ID
+        const EMAILJS_TEMPLATE_ID = 'template_3s8h35a'; // 替换为您的Template ID
         const ADMIN_EMAIL = 'blackwhilecolor@Outlook.com'; // 管理员邮箱地址
         
         // 初始化EmailJS
         (function() {
             emailjs.init(EMAILJS_PUBLIC_KEY);
+            
+            // 检查EmailJS配置状态
+            setTimeout(() => {
+                const statusIndicator = document.getElementById('configStatus');
+                const statusText = document.getElementById('configStatusText');
+                
+                if (EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
+                    statusIndicator.style.backgroundColor = '#2ecc71';
+                    statusText.textContent = 'EmailJS配置正常，可以发送邮件';
+                } else {
+                    statusIndicator.style.backgroundColor = '#e74c3c';
+                    statusText.textContent = 'EmailJS配置不完整，请检查配置';
+                }
+            }, 1000);
         })();
         
         document.getElementById('infoForm').addEventListener('submit', function(e) {
@@ -449,6 +488,63 @@ const EMAILJS_TEMPLATE_ID = '您的Template ID';</pre>
             const newsletter = document.getElementById('newsletter').checked;
             
             // 简单验证
+            let isValid = validateForm(name, email, phone, age, city, occupation);
+            
+            // 如果验证通过，发送邮件并显示结果
+            if (isValid) {
+                // 准备邮件数据
+                const templateParams = {
+                    to_email: ADMIN_EMAIL,
+                    from_name: name,
+                    from_email: email,
+                    user_name: name,
+                    user_email: email,
+                    user_phone: phone,
+                    user_age: age,
+                    user_city: city,
+                    user_occupation: getOccupationText(occupation),
+                    user_interests: interests || '未填写',
+                    user_newsletter: newsletter ? '是' : '否',
+                    submission_date: new Date().toLocaleString('zh-CN'),
+                    subject: `新表单提交 - ${name}`
+                };
+                
+                // 使用EmailJS发送邮件
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                    .then(function(response) {
+                        console.log('邮件发送成功!', response.status, response.text);
+                        showNotification('信息已成功发送给管理员！', 'success');
+                        
+                        // 显示结果
+                        displayResults(name, email, phone, age, city, occupation, interests, newsletter);
+                        
+                        // 重置表单
+                        document.getElementById('infoForm').reset();
+                    })
+                    .catch(function(error) {
+                        console.error('邮件发送失败:', error);
+                        let errorMessage = '邮件发送失败，请稍后重试或直接联系管理员。';
+                        
+                        // 提供更具体的错误信息
+                        if (error.text) {
+                            errorMessage += ` 错误详情: ${error.text}`;
+                        }
+                        
+                        showNotification(errorMessage, 'error');
+                    })
+                    .finally(function() {
+                        // 重新启用提交按钮
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交信息并发送邮件给管理员';
+                    });
+            } else {
+                // 验证失败，重新启用提交按钮
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交信息并发送邮件给管理员';
+            }
+        });
+        
+        function validateForm(name, email, phone, age, city, occupation) {
             let isValid = true;
             
             if (name.trim() === '') {
@@ -493,51 +589,8 @@ const EMAILJS_TEMPLATE_ID = '您的Template ID';</pre>
                 document.getElementById('occupationError').style.display = 'none';
             }
             
-            // 如果验证通过，发送邮件并显示结果
-            if (isValid) {
-                // 准备邮件数据
-                const templateParams = {
-                    to_email: ADMIN_EMAIL,
-                    from_name: name,
-                    from_email: email,
-                    user_name: name,
-                    user_email: email,
-                    user_phone: phone,
-                    user_age: age,
-                    user_city: city,
-                    user_occupation: getOccupationText(occupation),
-                    user_interests: interests || '未填写',
-                    user_newsletter: newsletter ? '是' : '否',
-                    submission_date: new Date().toLocaleString('zh-CN')
-                };
-                
-                // 使用EmailJS发送邮件
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                    .then(function(response) {
-                        console.log('邮件发送成功!', response.status, response.text);
-                        showNotification('信息已成功发送给管理员！', 'success');
-                        
-                        // 显示结果
-                        displayResults(name, email, phone, age, city, occupation, interests, newsletter);
-                        
-                        // 重置表单
-                        document.getElementById('infoForm').reset();
-                    })
-                    .catch(function(error) {
-                        console.error('邮件发送失败:', error);
-                        showNotification('邮件发送失败，请稍后重试或直接联系管理员。', 'error');
-                    })
-                    .finally(function() {
-                        // 重新启用提交按钮
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交信息并发送邮件给管理员';
-                    });
-            } else {
-                // 验证失败，重新启用提交按钮
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交信息并发送邮件给管理员';
-            }
-        });
+            return isValid;
+        }
         
         function isValidEmail(email) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -601,6 +654,20 @@ const EMAILJS_TEMPLATE_ID = '您的Template ID';</pre>
                 notification.classList.remove('show');
             }, 5000);
         }
+        
+        // 实时表单验证
+        document.querySelectorAll('#infoForm input, #infoForm select').forEach(element => {
+            element.addEventListener('blur', function() {
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const age = document.getElementById('age').value;
+                const city = document.getElementById('city').value;
+                const occupation = document.getElementById('occupation').value;
+                
+                validateForm(name, email, phone, age, city, occupation);
+            });
+        });
     </script>
 </body>
 </html>
