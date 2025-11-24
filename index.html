@@ -528,19 +528,36 @@
                     submitBtn.disabled = true;
                 }
                 
-                // 检查是否达到最大尝试次数
+            function checkMaxAttempts() {
                 if (maxAttempts > 0 && attempts >= maxAttempts && gameActive) {
-                    addConsoleMessage(`很遗憾，你已经用了${maxAttempts}次机会。正确答案是${secretNumber}。`, 'error');
+                    naddConsoleMessage(`很遗憾，你已经用了${maxAttempts}次机会。正确答案是${secretNumber}。`, 'error');
                     gameActive = false;
                     targetNumber.textContent = secretNumber;
                     gameStatus.textContent = '已失败';
                     gameStatus.style.color = getComputedStyle(document.documentElement).getPropertyValue('--error-color');
-                    
-                    // 禁用输入
+
+        // 禁用输入
                     guessInput.disabled = true;
                     submitBtn.disabled = true;
-                }
-                
+        
+                    return true; // 达到最大次数
+    }
+                    return false; // 未达到最大次数
+}
+
+// 在每次猜测后调用这个函数
+            function processGuess() {
+                 if (!gameActive) return;
+    
+                     attempts++;
+    
+    // 检查是否达到最大尝试次数
+                 if (checkMaxAttempts()) {
+                    return; // 如果达到最大次数，直接返回
+    }
+    
+  
+               
                 // 清空输入框
                 guessInput.value = '';
                 guessInput.focus();
