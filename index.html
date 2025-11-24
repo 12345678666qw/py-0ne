@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>真心话</title>
+    <title>卑微的我想和你玩个游戏</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
@@ -11,12 +11,12 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: #333;
+            background: linear-gradient(135deg, #ffd6e7 0%, #ffb6c1 100%);
+            color: #5a3d5c;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -27,29 +27,43 @@
         .container {
             width: 100%;
             max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.95);
+            background-color: rgba(255, 255, 255, 0.9);
             border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-bottom: 30px;
         }
         
         header {
-            background: linear-gradient(to right, #2575fc, #6a11cb);
+            background: linear-gradient(to right, #ff8fab, #fb6f92);
             color: white;
             padding: 30px 40px;
             text-align: center;
+            position: relative;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path fill="white" d="M30,30 Q50,10 70,30 T90,30 T70,50 T90,70 T70,90 T50,70 T30,90 T10,70 T30,50 T10,30 T30,30 Z"/></svg>');
+            background-size: 80px;
         }
         
         header h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
             font-weight: 700;
+            position: relative;
         }
         
         header p {
             font-size: 1.1rem;
             opacity: 0.9;
+            position: relative;
         }
         
         .form-container {
@@ -58,74 +72,88 @@
         
         .form-group {
             margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ffb6c1;
+        }
+        
+        .form-group:last-child {
+            border-bottom: none;
         }
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             font-weight: 600;
-            color: #444;
+            color: #5a3d5c;
             font-size: 1.1rem;
         }
         
-        .input-with-icon {
-            position: relative;
-        }
-        
-        .input-with-icon i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6a11cb;
-            font-size: 1.2rem;
+        .question-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            background: #ff8fab;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            margin-right: 10px;
+            font-size: 0.9rem;
         }
         
         input, select, textarea {
             width: 100%;
-            padding: 15px 15px 15px 50px;
-            border: 2px solid #e1e1e1;
-            border-radius: 10px;
+            padding: 15px 20px;
+            border: 2px solid #f0d2dc;
+            border-radius: 12px;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background-color: #f9f9f9;
+            background-color: #fff9fb;
+            color: #5a3d5c;
         }
         
         textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
         }
         
         input:focus, select:focus, textarea:focus {
-            border-color: #6a11cb;
-            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2);
+            border-color: #ff8fab;
+            box-shadow: 0 0 0 3px rgba(255, 143, 171, 0.2);
             outline: none;
             background-color: white;
         }
         
-        .checkbox-group {
+        .radio-group, .checkbox-group {
             display: flex;
-            align-items: center;
-            gap: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
         }
         
-        .checkbox-group input {
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .radio-option input, .checkbox-option input {
             width: auto;
         }
         
         .btn-submit {
-            background: linear-gradient(to right, #2575fc, #6a11cb);
+            background: linear-gradient(to right, #ff8fab, #fb6f92);
             color: white;
             border: none;
             padding: 16px 30px;
             font-size: 1.1rem;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
             width: 100%;
-            margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255, 143, 171, 0.4);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -134,7 +162,7 @@
         
         .btn-submit:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.6);
+            box-shadow: 0 8px 20px rgba(255, 143, 171, 0.6);
         }
         
         .btn-submit:active {
@@ -148,59 +176,43 @@
             box-shadow: none;
         }
         
-        .error-message {
-            color: #e74c3c;
-            font-size: 0.9rem;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .results-container {
-            width: 100%;
-            max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            display: none;
-        }
-        
-        .results-container h2 {
-            color: #6a11cb;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .result-item {
-            margin-bottom: 15px;
-            padding: 15px;
-            background-color: #f5f5f5;
-            border-radius: 10px;
-            border-left: 5px solid #6a11cb;
-        }
-        
-        .result-item strong {
-            color: #444;
-        }
-        
-        .admin-notification {
-            background-color: #e8f4fd;
-            border-radius: 10px;
+        .anonymous-note {
+            background-color: #fff0f5;
+            border-radius: 12px;
             padding: 20px;
-            margin-top: 25px;
-            border-left: 5px solid #2575fc;
+            margin-top: 30px;
+            text-align: center;
+            border: 1px dashed #ffb6c1;
         }
         
-        .admin-notification h3 {
-            color: #2575fc;
+        .anonymous-note h3 {
+            color: #fb6f92;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
         }
         
+        .real-name-option {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .real-name-option input {
+            width: auto;
+        }
+        
+        .real-name-field {
+            margin-top: 15px;
+            display: none;
+        }
+        
         .footer {
-            color: white;
+            color: #5a3d5c;
             text-align: center;
             margin-top: 20px;
             font-size: 0.9rem;
@@ -211,7 +223,7 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background-color: #2ecc71;
+            background-color: #8ce0b8;
             color: white;
             padding: 15px 25px;
             border-radius: 10px;
@@ -225,58 +237,15 @@
         }
         
         .notification.error {
-            background-color: #e74c3c;
+            background-color: #fb6f92;
         }
         
         .notification.show {
             transform: translateX(0);
         }
         
-        .email-config {
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 25px;
-            border: 1px dashed #6a11cb;
-        }
-        
-        .email-config h3 {
-            color: #6a11cb;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .config-note {
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 10px;
-        }
-        
-        .config-status {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: #f0f0f0;
-        }
-        
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #2ecc71;
-        }
-        
-        .status-text {
-            font-weight: 500;
-        }
-        
         @media (max-width: 600px) {
-            .container, .results-container {
+            .container {
                 border-radius: 15px;
             }
             
@@ -302,144 +271,205 @@
                 transform: translateY(0);
             }
         }
+        
+        .heart {
+            color: #fb6f92;
+            animation: heartbeat 1.5s ease infinite;
+        }
+        
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-info-circle"></i> 请回答以下问题</h1>
-            <p>填写以下信息倾听你的内心</p>
+            <h1><i class="fas fa-heart heart"></i> 真心话</h1>
+            <p>分享你的想法，让我们更了解彼此</p>
         </header>
         
         <div class="form-container">
-            <form id="infoForm">
+            <form id="surveyForm">
                 <div class="form-group">
-                    <label for="问题一">请问你的性别？</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="问题一" 问题一="问题一" placeholder="请输入您的性别" required>
-                    </div>
-                    <div class="error-message" id="nameError">请输入有效的性别</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">电子邮箱</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-envelope"></i>
-                        <input type="email" id="email" name="email" placeholder="请输入您的电子邮箱" required>
-                    </div>
-                    <div class="error-message" id="emailError">请输入有效的电子邮箱地址</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone">手机号码</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-phone"></i>
-                        <input type="tel" id="phone" name="phone" placeholder="请输入您的手机号码" required>
-                    </div>
-                    <div class="error-message" id="phoneError">请输入有效的手机号码</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="age">年龄</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-birthday-cake"></i>
-                        <input type="number" id="age" name="age" min="1" max="120" placeholder="请输入您的年龄" required>
-                    </div>
-                    <div class="error-message" id="ageError">请输入有效的年龄（1-120）</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="city">所在城市</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-city"></i>
-                        <input type="text" id="city" name="city" placeholder="请输入您所在的城市" required>
-                    </div>
-                    <div class="error-message" id="cityError">请输入有效的城市名称</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="occupation">职业</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-briefcase"></i>
-                        <select id="occupation" name="occupation" required>
-                            <option value="" disabled selected>请选择您的职业</option>
-                            <option value="student">学生</option>
-                            <option value="engineer">工程师</option>
-                            <option value="teacher">教师</option>
-                            <option value="doctor">医生</option>
-                            <option value="designer">设计师</option>
-                            <option value="other">其他</option>
-                        </select>
-                    </div>
-                    <div class="error-message" id="occupationError">请选择您的职业</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="interests">兴趣爱好</label>
-                    <div class="input-with-icon">
-                        <i class="fas fa-heart"></i>
-                        <textarea id="interests" name="interests" placeholder="请简要描述您的兴趣爱好"></textarea>
+                    <label for="gender"><span class="question-number">1</span>你的性别？</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="male" name="gender" value="男" required>
+                            <label for="male">男</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="female" name="gender" value="女" required>
+                            <label for="female">女</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="secret" name="gender" value="保密" required>
+                            <label for="secret">保密</label>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="newsletter" name="newsletter">
-                        <label for="newsletter">我愿意接收相关资讯和更新</label>
+                    <label for="handsome"><span class="question-number">2</span>你认为咱班男生谁最帅？</label>
+                    <input type="text" id="handsome" name="handsome" placeholder="请输入名字" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="beautiful"><span class="question-number">3</span>你认为咱班女生谁最漂亮？</label>
+                    <input type="text" id="beautiful" name="beautiful" placeholder="请输入名字" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crush"><span class="question-number">4</span>在场你喜欢谁？</label>
+                    <input type="text" id="crush" name="crush" placeholder="请输入名字或说没有" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><span class="question-number">5</span>脸蛋和身材哪个更重要？</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="face" name="face_body" value="脸蛋" required>
+                            <label for="face">脸蛋</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="body" name="face_body" value="身材" required>
+                            <label for="body">身材</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="romantic"><span class="question-number">6</span>做过最浪漫的事情是什么？</label>
+                    <textarea id="romantic" name="romantic" placeholder="请描述..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crazy"><span class="question-number">7</span>做过最疯狂的事情是什么？</label>
+                    <textarea id="crazy" name="crazy" placeholder="请描述..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><span class="question-number">8</span>你有过最刻骨铭心的恋爱吗？</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="love_yes" name="love" value="有" required>
+                            <label for="love_yes">有</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="love_no" name="love" value="没有" required>
+                            <label for="love_no">没有</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fantasy"><span class="question-number">9</span>你对未来她(他)的幻想？</label>
+                    <textarea id="fantasy" name="fantasy" placeholder="请描述..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="best_friend"><span class="question-number">10</span>你最好的朋友？</label>
+                    <input type="text" id="best_friend" name="best_friend" placeholder="请输入名字" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="favorite_food"><span class="question-number">11</span>你最喜欢吃的二餐什么饭？</label>
+                    <input type="text" id="favorite_food" name="favorite_food" placeholder="请输入..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="favorite_course"><span class="question-number">12</span>你最喜欢数学专业课的哪门课？</label>
+                    <input type="text" id="favorite_course" name="favorite_course" placeholder="请输入..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sport"><span class="question-number">13</span>你想要体委在体育课给你加练什么项目？</label>
+                    <input type="text" id="sport" name="sport" placeholder="请输入..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label><span class="question-number">14</span>爱情与友情哪个更重要？</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="love_important" name="love_friend" value="爱情" required>
+                            <label for="love_important">爱情</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="friend_important" name="love_friend" value="友情" required>
+                            <label for="friend_important">友情</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="game"><span class="question-number">15</span>你玩什么游戏？(无或者游戏的名称)</label>
+                    <input type="text" id="game" name="game" placeholder="请输入游戏名称或写'无'" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><span class="question-number">16</span>今天有快递吗？</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="package_yes" name="package" value="有" required>
+                            <label for="package_yes">有</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="package_no" name="package" value="没有" required>
+                            <label for="package_no">没有</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="favorite_teacher"><span class="question-number">17</span>你最喜欢上哪个老师的课？</label>
+                    <input type="text" id="favorite_teacher" name="favorite_teacher" placeholder="请输入老师姓名" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="favorite_song"><span class="question-number">18</span>最喜欢的歌曲？</label>
+                    <input type="text" id="favorite_song" name="favorite_song" placeholder="请输入歌曲名称" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dream_space"><span class="question-number">19</span>你的到梦空间多少分了，说出来让我流下羡慕嫉妒的口水。</label>
+                    <input type="number" id="dream_space" name="dream_space" placeholder="请输入分数" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feeling"><span class="question-number">20</span>你现在什么感受？</label>
+                    <textarea id="feeling" name="feeling" placeholder="请描述..." required></textarea>
+                </div>
+                
+                <div class="anonymous-note">
+                    <h3><i class="fas fa-user-secret"></i> 匿名填写</h3>
+                    <p>本问卷默认匿名填写，你的个人信息不会被公开。</p>
+                    
+                    <div class="real-name-option">
+                        <input type="checkbox" id="real_name_option">
+                        <label for="real_name_option">我想实名填写</label>
+                    </div>
+                    
+                    <div class="real-name-field" id="real_name_field">
+                        <input type="text" id="real_name" name="real_name" placeholder="请输入你的姓名">
                     </div>
                 </div>
                 
                 <button type="submit" class="btn-submit" id="submitBtn">
-                    <i class="fas fa-paper-plane"></i> 提交信息并发送邮件给管理员
+                    <i class="fas fa-paper-plane"></i> 提交问卷
                 </button>
             </form>
-            
-            <div class="email-config">
-                <h3><i class="fas fa-cog"></i> 邮件配置状态</h3>
-                <div class="config-status">
-                    <div class="status-indicator" id="configStatus"></div>
-                    <div class="status-text" id="configStatusText">正在检查配置状态...</div>
-                </div>
-                <p>此表单使用EmailJS服务发送邮件到 <strong>blackwhilecolor@Outlook.com</strong>。</p>
-                <p>要使其正常工作，您需要：</p>
-                <ol>
-                    <li>在 <a href="https://www.emailjs.com" target="_blank">EmailJS官网</a> 注册账号</li>
-                    <li>创建一个电子邮件服务（如Gmail）</li>
-                    <li>创建一个电子邮件模板</li>
-                    <li>将下面的代码中的配置信息替换为您自己的：</li>
-                </ol>
-                <pre style="background: #f0f0f0; padding: 10px; border-radius: 5px; margin-top: 10px; overflow-x: auto;">
-// 在JavaScript部分替换这些配置
-const EMAILJS_PUBLIC_KEY = '您的Public Key';
-const EMAILJS_SERVICE_ID = '您的Service ID';
-const EMAILJS_TEMPLATE_ID = '您的Template ID';</pre>
-                <p class="config-note">注意：此代码仅用于演示目的。在实际生产环境中，建议使用后端服务处理邮件发送。</p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="results-container" id="results">
-        <h2><i class="fas fa-check-circle"></i> 信息提交成功</h2>
-        <p>感谢您提交信息！以下是您提供的信息：</p>
-        <div id="resultsContent">
-            <!-- 提交的信息将在这里显示 -->
-        </div>
-        
-        <div class="admin-notification">
-            <h3><i class="fas fa-bell"></i> 管理员通知</h3>
-            <p>您的信息已成功通过电子邮件发送给管理员。管理员会在24小时内通过您提供的联系方式与您联系。</p>
-            <p>如果您有任何紧急问题，请直接联系：blackwhilecolor@Outlook.com</p>
         </div>
     </div>
     
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
-        <span>信息已成功发送给管理员！</span>
+        <span>问卷提交成功！感谢你的参与，周三的考试你必定考的都会,蒙的全对！</span>
     </div>
     
     <div class="footer">
-        <p>© 2023 信息收集系统 | 使用EmailJS发送邮件至 blackwhilecolor@Outlook.com</p>
+        <p>© 256班不挂 | 考试必过</p>
     </div>
 
     <script>
@@ -447,191 +477,93 @@ const EMAILJS_TEMPLATE_ID = '您的Template ID';</pre>
         // 请替换为您的EmailJS配置
         const EMAILJS_PUBLIC_KEY = 'rmpp5KK75q7OQLzmC'; // 替换为您的Public Key
         const EMAILJS_SERVICE_ID = 'service_4qddlv8'; // 替换为您的Service ID
-        const EMAILJS_TEMPLATE_ID = 'template_3s8h35a'; // 替换为您的Template ID
-        const ADMIN_EMAIL = 'blackwhilecolor@Outlook.com'; // 管理员邮箱地址
+        const EMAILJS_TEMPLATE_ID = 'template_on1yz3l'; // 替换为您的Template ID
+        const ADMIN_EMAIL = 'blackwhilecolor@Outlook.com'; // 替换为接收问卷的管理员邮箱
         
         // 初始化EmailJS
         (function() {
             emailjs.init(EMAILJS_PUBLIC_KEY);
-            
-            // 检查EmailJS配置状态
-            setTimeout(() => {
-                const statusIndicator = document.getElementById('configStatus');
-                const statusText = document.getElementById('configStatusText');
-                
-                if (EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID) {
-                    statusIndicator.style.backgroundColor = '#2ecc71';
-                    statusText.textContent = 'EmailJS配置正常，可以发送邮件';
-                } else {
-                    statusIndicator.style.backgroundColor = '#e74c3c';
-                    statusText.textContent = 'EmailJS配置不完整，请检查配置';
-                }
-            }, 1000);
         })();
         
-        document.getElementById('infoForm').addEventListener('submit', function(e) {
+        // 实名填写选项切换
+        document.getElementById('real_name_option').addEventListener('change', function() {
+            const realNameField = document.getElementById('real_name_field');
+            if (this.checked) {
+                realNameField.style.display = 'block';
+            } else {
+                realNameField.style.display = 'none';
+            }
+        });
+        
+        // 表单提交处理
+        document.getElementById('surveyForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             // 禁用提交按钮，防止重复提交
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在发送邮件...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在提交...';
             
-            // 获取表单值
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            const age = document.getElementById('age').value;
-            const city = document.getElementById('city').value;
-            const occupation = document.getElementById('occupation').value;
-            const interests = document.getElementById('interests').value;
-            const newsletter = document.getElementById('newsletter').checked;
+            // 获取表单数据
+            const formData = new FormData(this);
+            const isRealName = document.getElementById('real_name_option').checked;
+            const realName = isRealName ? document.getElementById('real_name').value : '匿名用户';
             
-            // 简单验证
-            let isValid = validateForm(name, email, phone, age, city, occupation);
-            
-            // 如果验证通过，发送邮件并显示结果
-            if (isValid) {
-                // 准备邮件数据
-                const templateParams = {
-                    to_email: ADMIN_EMAIL,
-                    from_name: name,
-                    from_email: email,
-                    user_name: name,
-                    user_email: email,
-                    user_phone: phone,
-                    user_age: age,
-                    user_city: city,
-                    user_occupation: getOccupationText(occupation),
-                    user_interests: interests || '未填写',
-                    user_newsletter: newsletter ? '是' : '否',
-                    submission_date: new Date().toLocaleString('zh-CN'),
-                    subject: `新表单提交 - ${name}`
-                };
-                
-                // 使用EmailJS发送邮件
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                    .then(function(response) {
-                        console.log('邮件发送成功!', response.status, response.text);
-                        showNotification('信息已成功发送给管理员！', 'success');
-                        
-                        // 显示结果
-                        displayResults(name, email, phone, age, city, occupation, interests, newsletter);
-                        
-                        // 重置表单
-                        document.getElementById('infoForm').reset();
-                    })
-                    .catch(function(error) {
-                        console.error('邮件发送失败:', error);
-                        let errorMessage = '邮件发送失败，请稍后重试或直接联系管理员。';
-                        
-                        // 提供更具体的错误信息
-                        if (error.text) {
-                            errorMessage += ` 错误详情: ${error.text}`;
-                        }
-                        
-                        showNotification(errorMessage, 'error');
-                    })
-                    .finally(function() {
-                        // 重新启用提交按钮
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交信息并发送邮件给管理员';
-                    });
-            } else {
-                // 验证失败，重新启用提交按钮
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交信息并发送邮件给管理员';
-            }
-        });
-        
-        function validateForm(name, email, phone, age, city, occupation) {
-            let isValid = true;
-            
-            if (name.trim() === '') {
-                document.getElementById('nameError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('nameError').style.display = 'none';
-            }
-            
-            if (!isValidEmail(email)) {
-                document.getElementById('emailError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('emailError').style.display = 'none';
-            }
-            
-            if (!isValidPhone(phone)) {
-                document.getElementById('phoneError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('phoneError').style.display = 'none';
-            }
-            
-            if (age < 1 || age > 120) {
-                document.getElementById('ageError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('ageError').style.display = 'none';
-            }
-            
-            if (city.trim() === '') {
-                document.getElementById('cityError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('cityError').style.display = 'none';
-            }
-            
-            if (occupation === '') {
-                document.getElementById('occupationError').style.display = 'block';
-                isValid = false;
-            } else {
-                document.getElementById('occupationError').style.display = 'none';
-            }
-            
-            return isValid;
-        }
-        
-        function isValidEmail(email) {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(email);
-        }
-        
-        function isValidPhone(phone) {
-            const phoneRegex = /^1[3-9]\d{9}$/;
-            return phoneRegex.test(phone);
-        }
-        
-        function displayResults(name, email, phone, age, city, occupation, interests, newsletter) {
-            const resultsContent = document.getElementById('resultsContent');
-            resultsContent.innerHTML = `
-                <div class="result-item"><strong>姓名:</strong> ${name}</div>
-                <div class="result-item"><strong>电子邮箱:</strong> ${email}</div>
-                <div class="result-item"><strong>手机号码:</strong> ${phone}</div>
-                <div class="result-item"><strong>年龄:</strong> ${age}</div>
-                <div class="result-item"><strong>所在城市:</strong> ${city}</div>
-                <div class="result-item"><strong>职业:</strong> ${getOccupationText(occupation)}</div>
-                <div class="result-item"><strong>兴趣爱好:</strong> ${interests || '未填写'}</div>
-                <div class="result-item"><strong>接收资讯:</strong> ${newsletter ? '是' : '否'}</div>
-            `;
-            
-            document.getElementById('results').style.display = 'block';
-            
-            // 滚动到结果区域
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        function getOccupationText(value) {
-            const occupations = {
-                'student': '学生',
-                'engineer': '工程师',
-                'teacher': '教师',
-                'doctor': '医生',
-                'designer': '设计师',
-                'other': '其他'
+            // 构建邮件内容
+            const templateParams = {
+                to_email: ADMIN_EMAIL,
+                is_real_name: isRealName ? '是' : '否',
+                real_name: realName,
+                submission_date: new Date().toLocaleString('zh-CN'),
+                gender: formData.get('gender'),
+                handsome: formData.get('handsome'),
+                beautiful: formData.get('beautiful'),
+                crush: formData.get('crush'),
+                face_body: formData.get('face_body'),
+                romantic: formData.get('romantic'),
+                crazy: formData.get('crazy'),
+                love: formData.get('love'),
+                fantasy: formData.get('fantasy'),
+                best_friend: formData.get('best_friend'),
+                favorite_food: formData.get('favorite_food'),
+                favorite_course: formData.get('favorite_course'),
+                sport: formData.get('sport'),
+                love_friend: formData.get('love_friend'),
+                game: formData.get('game'),
+                package: formData.get('package'),
+                favorite_teacher: formData.get('favorite_teacher'),
+                favorite_song: formData.get('favorite_song'),
+                dream_space: formData.get('dream_space'),
+                feeling: formData.get('feeling')
             };
-            return occupations[value] || value;
-        }
+            
+            // 使用EmailJS发送邮件
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(function(response) {
+                    console.log('问卷提交成功!', response.status, response.text);
+                    showNotification('问卷提交成功！感谢你的参与,周三的考试你必定考的都会,蒙的全对！', 'success');
+                    
+                    // 重置表单
+                    document.getElementById('surveyForm').reset();
+                    document.getElementById('real_name_field').style.display = 'none';
+                    document.getElementById('real_name_option').checked = false;
+                })
+                .catch(function(error) {
+                    console.error('问卷提交失败:', error);
+                    let errorMessage = '提交失败，请稍后重试。';
+                    
+                    if (error.text) {
+                        errorMessage += ` 错误详情: ${error.text}`;
+                    }
+                    
+                    showNotification(errorMessage, 'error');
+                })
+                .finally(function() {
+                    // 重新启用提交按钮
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问卷';
+                });
+        });
         
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
@@ -654,20 +586,6 @@ const EMAILJS_TEMPLATE_ID = '您的Template ID';</pre>
                 notification.classList.remove('show');
             }, 5000);
         }
-        
-        // 实时表单验证
-        document.querySelectorAll('#infoForm input, #infoForm select').forEach(element => {
-            element.addEventListener('blur', function() {
-                const name = document.getElementById('name').value;
-                const email = document.getElementById('email').value;
-                const phone = document.getElementById('phone').value;
-                const age = document.getElementById('age').value;
-                const city = document.getElementById('city').value;
-                const occupation = document.getElementById('occupation').value;
-                
-                validateForm(name, email, phone, age, city, occupation);
-            });
-        });
     </script>
 </body>
 </html>
