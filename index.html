@@ -244,6 +244,80 @@
             transform: translateX(0);
         }
         
+        /* 视频播放器样式 */
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        
+        .video-container.active {
+            display: flex;
+        }
+        
+        .video-player {
+            width: 90%;
+            max-width: 800px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .video-info {
+            color: white;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+        
+        .video-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #ff8fab;
+        }
+        
+        .video-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.8;
+        }
+        
+        .video-warning {
+            position: absolute;
+            bottom: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .video-progress {
+            width: 90%;
+            max-width: 800px;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .video-progress-bar {
+            height: 100%;
+            background-color: #ff8fab;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
         @media (max-width: 600px) {
             .container {
                 border-radius: 15px;
@@ -269,6 +343,10 @@
             
             .notification.show {
                 transform: translateY(0);
+            }
+            
+            .video-player {
+                width: 95%;
             }
         }
         
@@ -463,6 +541,21 @@
         </div>
     </div>
     
+    <!-- 视频播放器容器 -->
+    <div class="video-container" id="videoContainer">
+        <video class="video-player" id="videoPlayer" controls autoplay></video>
+        <div class="video-progress">
+            <div class="video-progress-bar" id="videoProgressBar"></div>
+        </div>
+        <div class="video-info">
+            <h2 class="video-title" id="videoTitle">视频标题</h2>
+            <p class="video-description" id="videoDescription">视频描述</p>
+        </div>
+        <div class="video-warning">
+            <p><i class="fas fa-exclamation-circle"></i> 视频播放期间无法跳过或中断，请耐心观看</p>
+        </div>
+    </div>
+    
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <span>问卷提交成功！感谢你的参与，周三的考试你必定考的都会,蒙的全对！</span>
@@ -479,6 +572,28 @@
         const EMAILJS_SERVICE_ID = 'service_4qddlv8'; // 替换为您的Service ID
         const EMAILJS_TEMPLATE_ID = 'template_on1yz3l'; // 替换为您的Template ID
         const ADMIN_EMAIL = 'blackwhilecolor@Outlook.com'; // 替换为接收问卷的管理员邮箱
+        
+        // 视频数据
+        const videos = [
+            {
+                id: 1,
+                title: "温馨感谢",
+                description: "感谢您完成问卷，您的参与对我们非常重要",
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/f857bbfda8b0f309a66aa3ae9b2e4a35.mp4"
+            },
+            {
+                id: 2,
+                title: "考试祝福",
+                description: "祝您在接下来的考试中取得优异成绩",
+                url: "https://github.com/user-attachments/assets/bd8d18e2-ea2f-4488-b985-09ed315e21bb"
+            },
+            {
+                id: 3,
+                title: "班级时光",
+                description: "珍惜班级时光，创造美好回忆",
+                url: "https://github.com/user-attachments/assets/3203d421-2147-4ced-ba42-54249225e846"
+            }
+        ];
         
         // 初始化EmailJS
         (function() {
@@ -541,12 +656,19 @@
             emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
                 .then(function(response) {
                     console.log('问卷提交成功!', response.status, response.text);
+                    
+                    // 显示成功通知
                     showNotification('问卷提交成功！感谢你的参与,周三的考试你必定考的都会,蒙的全对！', 'success');
                     
                     // 重置表单
                     document.getElementById('surveyForm').reset();
                     document.getElementById('real_name_field').style.display = 'none';
                     document.getElementById('real_name_option').checked = false;
+                    
+                    // 随机选择一个视频播放
+                    setTimeout(() => {
+                        playRandomVideo();
+                    }, 1500);
                 })
                 .catch(function(error) {
                     console.error('问卷提交失败:', error);
@@ -564,6 +686,62 @@
                     submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问卷';
                 });
         });
+        
+        // 播放随机视频
+        function playRandomVideo() {
+            // 随机选择视频
+            const randomIndex = Math.floor(Math.random() * videos.length);
+            const selectedVideo = videos[randomIndex];
+            
+            // 获取视频元素和容器
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoContainer = document.getElementById('videoContainer');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoDescription = document.getElementById('videoDescription');
+            
+            // 设置视频信息
+            videoTitle.textContent = selectedVideo.title;
+            videoDescription.textContent = selectedVideo.description;
+            
+            // 设置视频源
+            videoPlayer.src = selectedVideo.url;
+            
+            // 显示视频容器
+            videoContainer.classList.add('active');
+            
+            // 监听视频进度更新
+            videoPlayer.addEventListener('timeupdate', updateVideoProgress);
+            
+            // 监听视频结束
+            videoPlayer.addEventListener('ended', function() {
+                // 视频播放完毕，隐藏容器
+                setTimeout(() => {
+                    videoContainer.classList.remove('active');
+                    videoPlayer.removeEventListener('timeupdate', updateVideoProgress);
+                }, 1000);
+            });
+            
+            // 阻止右键菜单和键盘控制
+            videoContainer.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+            
+            // 阻止键盘控制
+            document.addEventListener('keydown', function(e) {
+                if (videoContainer.classList.contains('active')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, false);
+        }
+        
+        // 更新视频进度条
+        function updateVideoProgress() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const progressBar = document.getElementById('videoProgressBar');
+            const progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
         
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
