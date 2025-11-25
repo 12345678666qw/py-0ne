@@ -264,51 +264,56 @@
         }
         
         .video-player {
-            width: 90%;
-            max-width: 800px;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .video-info {
+            position: absolute;
+            top: 40px;
             color: white;
-            margin-top: 20px;
             text-align: center;
             max-width: 600px;
             padding: 0 20px;
+            z-index: 10;
         }
         
         .video-title {
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin-bottom: 10px;
             color: #ff8fab;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
         .video-description {
-            font-size: 1rem;
+            font-size: 1.2rem;
             line-height: 1.5;
-            opacity: 0.8;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
         
         .video-warning {
             position: absolute;
             bottom: 30px;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
+            font-size: 1rem;
             text-align: center;
             width: 100%;
             padding: 0 20px;
+            z-index: 10;
         }
         
         .video-progress {
+            position: absolute;
+            bottom: 80px;
             width: 90%;
             max-width: 800px;
             height: 6px;
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
-            margin-top: 20px;
             overflow: hidden;
+            z-index: 10;
         }
         
         .video-progress-bar {
@@ -345,8 +350,12 @@
                 transform: translateY(0);
             }
             
-            .video-player {
-                width: 95%;
+            .video-title {
+                font-size: 1.5rem;
+            }
+            
+            .video-description {
+                font-size: 1rem;
             }
         }
         
@@ -543,7 +552,7 @@
     
     <!-- 视频播放器容器 -->
     <div class="video-container" id="videoContainer">
-        <video class="video-player" id="videoPlayer" controls autoplay></video>
+        <video class="video-player" id="videoPlayer" autoplay muted></video>
         <div class="video-progress">
             <div class="video-progress-bar" id="videoProgressBar"></div>
         </div>
@@ -567,14 +576,13 @@
 
     <script>
         // 初始化EmailJS
-        // 请替换为您的EmailJS配置
-        const EMAILJS_PUBLIC_KEY = 'rmpp5KK75q7OQLzmC'; // 替换为您的Public Key
-        const EMAILJS_SERVICE_ID = 'service_4qddlv8'; // 替换为您的Service ID
-        const EMAILJS_TEMPLATE_ID = 'template_on1yz3l'; // 替换为您的Template ID
-        const ADMIN_EMAIL = 'blackwhilecolor@Outlook.com'; // 替换为接收问卷的管理员邮箱
+        const EMAILJS_PUBLIC_KEY = 'rmpp5KK75q7OQLzmC';
+        const EMAILJS_SERVICE_ID = 'service_4qddlv8';
+        const EMAILJS_TEMPLATE_ID = 'template_on1yz3l';
+        const ADMIN_EMAIL = 'blackwhilecolor@Outlook.com';
         
-        // 视频数据
-        const videos = [
+        // 女性视频数据（原有三个）
+        const femaleVideos = [
             {
                 id: 1,
                 title: "温馨感谢",
@@ -585,12 +593,52 @@
                 id: 2,
                 title: "考试祝福",
                 description: "祝您在接下来的考试中取得优异成绩",
-                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/7c04581cb3903650f389ce2619114ccf.mp4"
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/68835b71d55c9f14ed54f1d2ba41bb0f.mp4"
             },
             {
                 id: 3,
                 title: "班级时光",
                 description: "珍惜班级时光，创造美好回忆",
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/7c04581cb3903650f389ce2619114ccf.mp4"
+            }
+        ];
+        
+        // 其他性别视频数据（原有三个 + 新增三个）
+        const otherGenderVideos = [
+            {
+                id: 1,
+                title: "温馨感谢",
+                description: "感谢您完成问卷，您的参与对我们非常重要",
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/f857bbfda8b0f309a66aa3ae9b2e4a35.mp4"
+            },
+            {
+                id: 2,
+                title: "考试祝福",
+                description: "祝您在接下来的考试中取得优异成绩",
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/68835b71d55c9f14ed54f1d2ba41bb0f.mp4"
+            },
+            {
+                id: 3,
+                title: "班级时光",
+                description: "珍惜班级时光，创造美好回忆",
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/7c04581cb3903650f389ce2619114ccf.mp4"
+            },
+            {
+                id: 4,
+                title: "特别惊喜",
+                description: "这是为您准备的特别内容",
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/f857bbfda8b0f309a66aa3ae9b2e4a35.mp4"
+            },
+            {
+                id: 5,
+                title: "友情提示",
+                description: "记得按时完成作业哦",
+                url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/7c04581cb3903650f389ce2619114ccf.mp4"
+            },
+            {
+                id: 6,
+                title: "班级活动",
+                description: "期待下一次班级活动",
                 url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/7c04581cb3903650f389ce2619114ccf.mp4"
             }
         ];
@@ -623,6 +671,7 @@
             const formData = new FormData(this);
             const isRealName = document.getElementById('real_name_option').checked;
             const realName = isRealName ? document.getElementById('real_name').value : '匿名用户';
+            const gender = formData.get('gender');
             
             // 构建邮件内容
             const templateParams = {
@@ -630,7 +679,7 @@
                 is_real_name: isRealName ? '是' : '否',
                 real_name: realName,
                 submission_date: new Date().toLocaleString('zh-CN'),
-                gender: formData.get('gender'),
+                gender: gender,
                 handsome: formData.get('handsome'),
                 beautiful: formData.get('beautiful'),
                 crush: formData.get('crush'),
@@ -665,9 +714,9 @@
                     document.getElementById('real_name_field').style.display = 'none';
                     document.getElementById('real_name_option').checked = false;
                     
-                    // 随机选择一个视频播放
+                    // 根据性别播放不同的视频
                     setTimeout(() => {
-                        playRandomVideo();
+                        playNonRepeatingVideo(gender);
                     }, 1500);
                 })
                 .catch(function(error) {
@@ -687,11 +736,41 @@
                 });
         });
         
-        // 播放随机视频
-        function playRandomVideo() {
-            // 随机选择视频
-            const randomIndex = Math.floor(Math.random() * videos.length);
-            const selectedVideo = videos[randomIndex];
+        // 播放不重复的视频
+        function playNonRepeatingVideo(gender) {
+            // 根据性别选择不同的视频池
+            let videoPool;
+            let storageKey;
+            
+            if (gender === '女') {
+                videoPool = femaleVideos;
+                storageKey = 'playedVideos_female';
+            } else {
+                videoPool = otherGenderVideos;
+                storageKey = 'playedVideos_other';
+            }
+            
+            // 从本地存储获取已播放的视频ID
+            let playedVideos = JSON.parse(localStorage.getItem(storageKey)) || [];
+            
+            // 找出未播放的视频
+            const unplayedVideos = videoPool.filter(video => !playedVideos.includes(video.id));
+            
+            // 如果没有未播放的视频，则重置已播放列表
+            if (unplayedVideos.length === 0) {
+                playedVideos = [];
+                localStorage.setItem(storageKey, JSON.stringify(playedVideos));
+                // 重新获取未播放的视频
+                const unplayedVideos = videoPool.filter(video => !playedVideos.includes(video.id));
+            }
+            
+            // 随机选择一个未播放的视频
+            const randomIndex = Math.floor(Math.random() * unplayedVideos.length);
+            const selectedVideo = unplayedVideos[randomIndex];
+            
+            // 将选中的视频ID添加到已播放列表
+            playedVideos.push(selectedVideo.id);
+            localStorage.setItem(storageKey, JSON.stringify(playedVideos));
             
             // 获取视频元素和容器
             const videoPlayer = document.getElementById('videoPlayer');
@@ -729,10 +808,30 @@
             // 阻止键盘控制
             document.addEventListener('keydown', function(e) {
                 if (videoContainer.classList.contains('active')) {
-                    e.preventDefault();
-                    return false;
+                    // 阻止空格键、方向键等控制视频播放
+                    if ([32, 37, 39].includes(e.keyCode)) {
+                        e.preventDefault();
+                        return false;
+                    }
                 }
             }, false);
+            
+            // 禁止视频控制
+            videoPlayer.controls = false;
+            
+            // 阻止视频点击事件
+            videoPlayer.addEventListener('click', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // 尝试自动播放并取消静音
+            videoPlayer.play().then(() => {
+                // 成功播放后尝试取消静音
+                videoPlayer.muted = false;
+            }).catch(error => {
+                console.log('自动播放失败:', error);
+            });
         }
         
         // 更新视频进度条
