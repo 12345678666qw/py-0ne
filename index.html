@@ -322,6 +322,22 @@
             width: 0%;
             transition: width 0.3s ease;
         }
+
+        .video-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.5rem;
+            text-align: center;
+            z-index: 10;
+            display: none;
+        }
+        
+        .video-loading.active {
+            display: block;
+        }
         
         @media (max-width: 600px) {
             .container {
@@ -552,7 +568,10 @@
     
     <!-- 视频播放器容器 -->
     <div class="video-container" id="videoContainer">
-        <video class="video-player" id="videoPlayer" autoplay muted></video>
+        <div class="video-loading" id="videoLoading">
+            <i class="fas fa-spinner fa-spin"></i> 视频加载中，请稍候...
+        </div>
+        <video class="video-player" id="videoPlayer" autoplay muted playsinline></video>
         <div class="video-progress">
             <div class="video-progress-bar" id="videoProgressBar"></div>
         </div>
@@ -728,6 +747,11 @@
                     }
                     
                     showNotification(errorMessage, 'error');
+                    
+                    // 即使邮件发送失败，也播放视频
+                    setTimeout(() => {
+                        playNonRepeatingVideo(gender);
+                    }, 1500);
                 })
                 .finally(function() {
                     // 重新启用提交按钮
@@ -738,6 +762,8 @@
         
         // 播放不重复的视频
         function playNonRepeatingVideo(gender) {
+            console.log("开始播放视频，性别:", gender);
+            
             // 根据性别选择不同的视频池
             let videoPool;
             let storageKey;
@@ -768,6 +794,8 @@
             const randomIndex = Math.floor(Math.random() * unplayedVideos.length);
             const selectedVideo = unplayedVideos[randomIndex];
             
+            console.log("选择的视频:", selectedVideo);
+            
             // 将选中的视频ID添加到已播放列表
             playedVideos.push(selectedVideo.id);
             localStorage.setItem(storageKey, JSON.stringify(playedVideos));
@@ -777,22 +805,43 @@
             const videoContainer = document.getElementById('videoContainer');
             const videoTitle = document.getElementById('videoTitle');
             const videoDescription = document.getElementById('videoDescription');
+            const videoLoading = document.getElementById('videoLoading');
             
             // 设置视频信息
             videoTitle.textContent = selectedVideo.title;
             videoDescription.textContent = selectedVideo.description;
             
+            // 显示视频容器
+            videoContainer.classList.add('active');
+            videoLoading.classList.add('active');
+            
             // 设置视频源
             videoPlayer.src = selectedVideo.url;
             
-            // 显示视频容器
-            videoContainer.classList.add('active');
+            // 监听视频加载事件
+            videoPlayer.addEventListener('loadeddata', function() {
+                console.log("视频已加载");
+                videoLoading.classList.remove('active');
+            });
+            
+            // 监听视频错误
+            videoPlayer.addEventListener('error', function(e) {
+                console.error("视频加载错误:", e);
+                videoLoading.classList.remove('active');
+                showNotification('视频加载失败，请检查网络连接', 'error');
+                
+                // 3秒后隐藏视频容器
+                setTimeout(() => {
+                    videoContainer.classList.remove('active');
+                }, 3000);
+            });
             
             // 监听视频进度更新
             videoPlayer.addEventListener('timeupdate', updateVideoProgress);
             
             // 监听视频结束
             videoPlayer.addEventListener('ended', function() {
+                console.log("视频播放完毕");
                 // 视频播放完毕，隐藏容器
                 setTimeout(() => {
                     videoContainer.classList.remove('active');
@@ -825,13 +874,25 @@
                 return false;
             });
             
-            // 尝试自动播放并取消静音
-            videoPlayer.play().then(() => {
-                // 成功播放后尝试取消静音
-                videoPlayer.muted = false;
-            }).catch(error => {
-                console.log('自动播放失败:', error);
-            });
+            // 尝试自动播放
+            const playPromise = videoPlayer.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("视频自动播放成功");
+                    // 成功播放后尝试取消静音
+                    videoPlayer.muted = false;
+                }).catch(error => {
+                    console.log('自动播放失败:', error);
+                    showNotification('请点击屏幕以播放视频', 'error');
+                    
+                    // 添加点击事件以手动播放
+                    videoContainer.addEventListener('click', function playOnClick() {
+                        videoPlayer.play();
+                        videoContainer.removeEventListener('click', playOnClick);
+                    });
+                });
+            }
         }
         
         // 更新视频进度条
