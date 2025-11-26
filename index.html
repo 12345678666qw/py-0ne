@@ -45,8 +45,70 @@
         .video-progress-bar { height: 100%; background: #ff8fab; width: 0%; transition: width 0.3s ease; }
         .video-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 1.5rem; text-align: center; z-index: 10; display: none; }
         .video-loading.active { display: block; }
+        .video-controls { position: absolute; bottom: 100px; display: flex; gap: 15px; z-index: 10; opacity: 0; transition: opacity 0.3s ease; }
+        .video-container.active .video-controls { opacity: 1; }
+        .video-control-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .video-control-btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
         .preload-indicator { position: fixed; bottom: 20px; left: 20px; background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; z-index: 100; display: none; }
         .preload-indicator.active { display: block; }
+        
+        /* 游戏继续弹窗样式 */
+        .game-continue-modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.8); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 10000; 
+            flex-direction: column; 
+        }
+        .game-continue-modal.active { display: flex; }
+        .game-continue-content { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 40px; 
+            text-align: center; 
+            max-width: 500px; 
+            width: 90%; 
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); 
+        }
+        .game-continue-title { 
+            font-size: 2rem; 
+            margin-bottom: 15px; 
+            color: #ff8fab; 
+        }
+        .game-continue-description { 
+            font-size: 1.1rem; 
+            margin-bottom: 25px; 
+            color: #5a3d5c; 
+            line-height: 1.5; 
+        }
+        .game-continue-btn { 
+            background: linear-gradient(to right, #ff8fab, #fb6f92); 
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            font-size: 1.2rem; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            font-weight: 600; 
+            box-shadow: 0 5px 15px rgba(255, 143, 171, 0.4); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            margin: 0 auto; 
+        }
+        .game-continue-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 20px rgba(255, 143, 171, 0.6); 
+        }
+        
         .heart { color: #fb6f92; animation: heartbeat 1.5s ease infinite; }
         @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         @media (max-width: 600px) {
@@ -59,6 +121,11 @@
             .video-title { font-size: 1.5rem; }
             .video-description { font-size: 1rem; }
             .preload-indicator { bottom: 10px; left: 10px; font-size: 0.8rem; padding: 8px 12px; }
+            .video-controls { bottom: 70px; flex-direction: column; }
+            .video-control-btn { padding: 8px 15px; font-size: 0.9rem; }
+            .game-continue-content { padding: 25px; }
+            .game-continue-title { font-size: 1.5rem; }
+            .game-continue-description { font-size: 1rem; }
         }
     </style>
 </head>
@@ -75,7 +142,7 @@
             <form id="surveyForm">
                 <!-- 性别选择 -->
                 <div class="form-group">
-                    <label for="gender"><span class="question-number">1</span>你的性别？</label>
+                    <label for="gender"><span class="question-number">1</span>你的性别是？</label>
                     <div class="radio-group">
                         <div class="radio-option"><input type="radio" id="male" name="gender" value="男" required><label for="male">男</label></div>
                         <div class="radio-option"><input type="radio" id="female" name="gender" value="女" required><label for="female">女</label></div>
@@ -83,14 +150,41 @@
                     </div>
                 </div>
                 
-                <!-- 问卷问题 - 简化显示 -->
-                <div class="form-group"><label for="handsome"><span class="question-number">2</span>你认为咱班男生谁最帅？</label><input type="text" id="handsome" name="handsome" placeholder="请输入名字或者填无" required></div>
-                <div class="form-group"><label for="beautiful"><span class="question-number">3</span>你认为咱班女生谁最漂亮？</label><input type="text" id="beautiful" name="beautiful" placeholder="请输入名字" required></div>
-                <div class="form-group"><label for="crush"><span class="question-number">4</span>你最喜欢的游戏？</label><input type="text" id="crush" name="crush" placeholder="请输入游戏名字?" required></div>
-                <div class="form-group"><label for="romantic"><span class="question-number">6</span>你到梦空间的学分有多少了说出来让我羡慕流口水一下？</label><textarea id="romantic" name="romantic" placeholder="请写下数字..." required></textarea></div>
-                <div class="form-group"><label for="crazy"><span class="question-number">7</span>你最喜欢的美食是什么？</label><textarea id="crazy" name="crazy" placeholder="请描述..." required></textarea></div>
-                <div class="form-group"><label for="fantasy"><span class="question-number">9</span>想吃饼干吗，如果想请实名？</label><textarea id="fantasy" name="fantasy" placeholder="请描述..." required></textarea></div>
-                <div class="form-group"><label for="feeling"><span class="question-number">20</span>你现在什么感受？</label><textarea id="feeling" name="feeling" placeholder="请描述..." required></textarea></div>
+                <!-- 问卷问题 - 合理化后的内容 -->
+                <div class="form-group">
+                    <label for="handsome"><span class="question-number">2</span>你认为我们班级里哪位男生最帅？</label>
+                    <input type="text" id="handsome" name="handsome" placeholder="请输入名字（如果觉得没有，可以填写'无'）" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="beautiful"><span class="question-number">3</span>你认为我们班级里哪位女生最漂亮？</label>
+                    <input type="text" id="beautiful" name="beautiful" placeholder="请输入名字" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crush"><span class="question-number">4</span>你最喜欢的游戏是什么？</label>
+                    <input type="text" id="crush" name="crush" placeholder="请输入你最喜欢的游戏名称" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="romantic"><span class="question-number">5</span>请分享你在"到梦空间"获得的学分数量</label>
+                    <textarea id="romantic" name="romantic" placeholder="请写下你的学分数量，让我们羡慕一下..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crazy"><span class="question-number">6</span>你最喜欢的美食是什么？</label>
+                    <textarea id="crazy" name="crazy" placeholder="请描述你最喜欢的美食..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fantasy"><span class="question-number">7</span>你想吃饼干吗？如果想吃，请留下你的名字</label>
+                    <textarea id="fantasy" name="fantasy" placeholder="请告诉我们你是否想吃饼干，如果想的话请留下你的名字..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feeling"><span class="question-number">8</span>你现在有什么感受？</label>
+                    <textarea id="feeling" name="feeling" placeholder="请描述你现在的感受..." required></textarea>
+                </div>
                 
                 <!-- 匿名选项 -->
                 <div class="anonymous-note">
@@ -114,7 +208,20 @@
             <h2 class="video-title" id="videoTitle">视频标题</h2>
             <p class="video-description" id="videoDescription">视频描述</p>
         </div>
+        <div class="video-controls">
+            <button class="video-control-btn" id="replayBtn"><i class="fas fa-redo"></i> 重新播放</button>
+            <button class="video-control-btn" id="closeVideoBtn"><i class="fas fa-times"></i> 关闭视频</button>
+        </div>
         <div class="video-warning"><p><i class="fas fa-exclamation-circle"></i> 视频播放期间无法跳过或中断，请耐心观看</p></div>
+    </div>
+    
+    <!-- 游戏继续弹窗 -->
+    <div class="game-continue-modal" id="gameContinueModal">
+        <div class="game-continue-content">
+            <h2 class="game-continue-title">恭喜！</h2>
+            <p class="game-continue-description">你已经完成了两次视频观看，是否要继续游戏？点击下方按钮继续体验更多精彩内容！</p>
+            <button class="game-continue-btn" id="continueGameBtn"><i class="fas fa-gamepad"></i> 继续游戏</button>
+        </div>
     </div>
     
     <div class="notification" id="notification"><i class="fas fa-check-circle"></i><span>问卷提交成功！感谢你的参与，周三的考试你必定考的都会,蒙的全对！</span></div>
@@ -152,6 +259,8 @@
         // 全局变量
         let preloadedVideo = null;
         let preloadedVideoData = null;
+        let currentVideoData = null;
+        let videoPlayCount = 0;
         
         // 初始化
         function init() {
@@ -171,6 +280,16 @@
             
             // 表单提交
             document.getElementById('surveyForm').addEventListener('submit', handleFormSubmit);
+            
+            // 视频控制按钮
+            document.getElementById('replayBtn').addEventListener('click', replayVideo);
+            document.getElementById('closeVideoBtn').addEventListener('click', closeVideo);
+            
+            // 游戏继续按钮
+            document.getElementById('continueGameBtn').addEventListener('click', continueGame);
+            
+            // 初始化播放计数
+            videoPlayCount = parseInt(localStorage.getItem('videoPlayCount')) || 0;
         }
         
         // 表单提交处理
@@ -270,6 +389,7 @@
             const videoTitle = document.getElementById('videoTitle');
             const videoDescription = document.getElementById('videoDescription');
             
+            currentVideoData = preloadedVideoData;
             videoTitle.textContent = preloadedVideoData.title;
             videoDescription.textContent = preloadedVideoData.description;
             videoPlayer.src = preloadedVideoData.url;
@@ -284,12 +404,19 @@
             // 事件监听
             videoPlayer.addEventListener('timeupdate', updateVideoProgress);
             videoPlayer.addEventListener('ended', () => {
-                setTimeout(() => {
-                    videoContainer.classList.remove('active');
-                    videoPlayer.removeEventListener('timeupdate', updateVideoProgress);
-                    preloadedVideo = null;
-                    preloadedVideoData = null;
-                }, 1000);
+                // 视频结束后显示控制按钮
+                document.getElementById('replayBtn').style.display = 'block';
+                
+                // 增加播放计数
+                videoPlayCount++;
+                localStorage.setItem('videoPlayCount', videoPlayCount);
+                
+                // 检查是否需要显示游戏继续弹窗
+                if (videoPlayCount >= 2) {
+                    setTimeout(() => {
+                        document.getElementById('gameContinueModal').classList.add('active');
+                    }, 1000);
+                }
             });
             
             videoContainer.addEventListener('contextmenu', e => e.preventDefault());
@@ -340,6 +467,7 @@
             const videoDescription = document.getElementById('videoDescription');
             const videoLoading = document.getElementById('videoLoading');
             
+            currentVideoData = selectedVideo;
             videoTitle.textContent = selectedVideo.title;
             videoDescription.textContent = selectedVideo.description;
             videoPlayer.src = selectedVideo.url;
@@ -355,10 +483,19 @@
             
             videoPlayer.addEventListener('timeupdate', updateVideoProgress);
             videoPlayer.addEventListener('ended', () => {
-                setTimeout(() => {
-                    videoContainer.classList.remove('active');
-                    videoPlayer.removeEventListener('timeupdate', updateVideoProgress);
-                }, 1000);
+                // 视频结束后显示控制按钮
+                document.getElementById('replayBtn').style.display = 'block';
+                
+                // 增加播放计数
+                videoPlayCount++;
+                localStorage.setItem('videoPlayCount', videoPlayCount);
+                
+                // 检查是否需要显示游戏继续弹窗
+                if (videoPlayCount >= 2) {
+                    setTimeout(() => {
+                        document.getElementById('gameContinueModal').classList.add('active');
+                    }, 1000);
+                }
             });
             
             videoContainer.addEventListener('contextmenu', e => e.preventDefault());
@@ -381,6 +518,31 @@
                     videoContainer.removeEventListener('click', playOnClick);
                 });
             });
+        }
+        
+        // 重新播放视频
+        function replayVideo() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.currentTime = 0;
+            videoPlayer.play();
+            document.getElementById('replayBtn').style.display = 'none';
+        }
+        
+        // 关闭视频
+        function closeVideo() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoContainer = document.getElementById('videoContainer');
+            
+            videoPlayer.pause();
+            videoContainer.classList.remove('active');
+            document.getElementById('replayBtn').style.display = 'none';
+        }
+        
+        // 继续游戏
+        function continueGame() {
+            document.getElementById('gameContinueModal').classList.remove('active');
+            // 跳转到指定链接
+            window.location.href = 'https://zhuanpan.fxgqc.top/';
         }
         
         // 更新进度条
