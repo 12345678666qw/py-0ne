@@ -690,3 +690,583 @@ applyTheme(theme);
 </body>
 </html>
 ```
+2.<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>真心话问卷</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: linear-gradient(135deg, #ffd6e7 0%, #ffb6c1 100%); color: #5a3d5c; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+        .container { width: 100%; max-width: 800px; background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px; }
+        header { background: linear-gradient(to right, #ff8fab, #fb6f92); color: white; padding: 30px 40px; text-align: center; position: relative; }
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; font-weight: 700; position: relative; }
+        header p { font-size: 1.1rem; opacity: 0.9; position: relative; }
+        .form-container { padding: 40px; }
+        .form-group { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed #ffb6c1; }
+        label { display: block; margin-bottom: 12px; font-weight: 600; color: #5a3d5c; font-size: 1.1rem; }
+        .question-number { display: inline-block; width: 28px; height: 28px; background: #ff8fab; color: white; border-radius: 50%; text-align: center; line-height: 28px; margin-right: 10px; font-size: 0.9rem; }
+        input, textarea { width: 100%; padding: 15px 20px; border: 2px solid #f0d2dc; border-radius: 12px; font-size: 1rem; transition: all 0.3s ease; background: #fff9fb; color: #5a3d5c; }
+        textarea { min-height: 100px; resize: vertical; }
+        input:focus, textarea:focus { border-color: #ff8fab; box-shadow: 0 0 0 3px rgba(255, 143, 171, 0.2); outline: none; background: white; }
+        .radio-group { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 10px; }
+        .radio-option { display: flex; align-items: center; gap: 8px; }
+        .radio-option input { width: auto; }
+        .btn-submit { background: linear-gradient(to right, #ff8fab, #fb6f92); color: white; border: none; padding: 16px 30px; font-size: 1.1rem; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; font-weight: 600; width: 100%; margin-top: 20px; box-shadow: 0 5px 15px rgba(255, 143, 171, 0.4); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255, 143, 171, 0.6); }
+        .btn-submit:disabled { background: #cccccc; cursor: not-allowed; transform: none; box-shadow: none; }
+        .anonymous-note { background: #fff0f5; border-radius: 12px; padding: 20px; margin-top: 30px; text-align: center; border: 1px dashed #ffb6c1; }
+        .real-name-option { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; }
+        .real-name-option input { width: auto; }
+        .real-name-field { margin-top: 15px; display: none; }
+        .footer { color: #5a3d5c; text-align: center; margin-top: 20px; font-size: 0.9rem; opacity: 0.8; }
+        .notification { position: fixed; top: 20px; right: 20px; background: #8ce0b8; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); display: flex; align-items: center; gap: 10px; z-index: 1000; transform: translateX(150%); transition: transform 0.5s ease; }
+        .notification.error { background: #fb6f92; }
+        .notification.show { transform: translateX(0); }
+        .video-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: none; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
+        .video-container.active { display: flex; }
+        .video-player { width: 100%; height: 100%; object-fit: cover; }
+        .video-info { position: absolute; top: 40px; color: white; text-align: center; max-width: 600px; padding: 0 20px; z-index: 10; }
+        .video-title { font-size: 2rem; margin-bottom: 10px; color: #ff8fab; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .video-description { font-size: 1.2rem; line-height: 1.5; opacity: 0.9; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .video-warning { position: absolute; bottom: 30px; color: rgba(255, 255, 255, 0.7); font-size: 1rem; text-align: center; width: 100%; padding: 0 20px; z-index: 10; }
+        .video-progress { position: absolute; bottom: 80px; width: 90%; max-width: 800px; height: 6px; background: rgba(255, 255, 255, 0.2); border-radius: 3px; overflow: hidden; z-index: 10; }
+        .video-progress-bar { height: 100%; background: #ff8fab; width: 0%; transition: width 0.3s ease; }
+        .video-loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 1.5rem; text-align: center; z-index: 10; display: none; }
+        .video-loading.active { display: block; }
+        .video-controls { position: absolute; bottom: 100px; display: flex; gap: 15px; z-index: 10; opacity: 0; transition: opacity 0.3s ease; }
+        .video-container.active .video-controls { opacity: 1; }
+        .video-control-btn { background: rgba(255, 255, 255, 0.2); border: none; color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; }
+        .video-control-btn:hover { background: rgba(255, 255, 255, 0.3); transform: translateY(-2px); }
+        .preload-indicator { position: fixed; bottom: 20px; left: 20px; background: rgba(0, 0, 0, 0.7); color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; z-index: 100; display: none; }
+        .preload-indicator.active { display: block; }
+        
+        /* 游戏继续弹窗样式 */
+        .game-continue-modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.8); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 10000; 
+            flex-direction: column; 
+        }
+        .game-continue-modal.active { display: flex; }
+        .game-continue-content { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 40px; 
+            text-align: center; 
+            max-width: 500px; 
+            width: 90%; 
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3); 
+        }
+        .game-continue-title { 
+            font-size: 2rem; 
+            margin-bottom: 15px; 
+            color: #ff8fab; 
+        }
+        .game-continue-description { 
+            font-size: 1.1rem; 
+            margin-bottom: 25px; 
+            color: #5a3d5c; 
+            line-height: 1.5; 
+        }
+        .game-continue-btn { 
+            background: linear-gradient(to right, #ff8fab, #fb6f92); 
+            color: white; 
+            border: none; 
+            padding: 15px 30px; 
+            font-size: 1.2rem; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            font-weight: 600; 
+            box-shadow: 0 5px 15px rgba(255, 143, 171, 0.4); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 10px; 
+            margin: 0 auto; 
+        }
+        .game-continue-btn:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 20px rgba(255, 143, 171, 0.6); 
+        }
+        
+        .heart { color: #fb6f92; animation: heartbeat 1.5s ease infinite; }
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @media (max-width: 600px) {
+            .container { border-radius: 15px; }
+            header { padding: 20px; }
+            header h1 { font-size: 1.8rem; }
+            .form-container { padding: 25px; }
+            .notification { right: 10px; left: 10px; transform: translateY(-150%); }
+            .notification.show { transform: translateY(0); }
+            .video-title { font-size: 1.5rem; }
+            .video-description { font-size: 1rem; }
+            .preload-indicator { bottom: 10px; left: 10px; font-size: 0.8rem; padding: 8px 12px; }
+            .video-controls { bottom: 70px; flex-direction: column; }
+            .video-control-btn { padding: 8px 15px; font-size: 0.9rem; }
+            .game-continue-content { padding: 25px; }
+            .game-continue-title { font-size: 1.5rem; }
+            .game-continue-description { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="preload-indicator" id="preloadIndicator"><i class="fas fa-sync-alt fa-spin"></i> 视频预加载中...</div>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-heart heart"></i> 真心话</h1>
+            <p>分享你的想法，让我们更了解彼此（班级内部游戏，请不要外传）</p>
+        </header>
+        
+        <div class="form-container">
+            <form id="surveyForm">
+                <!-- 性别选择 -->
+                <div class="form-group">
+                    <label for="gender"><span class="question-number">1</span>你的性别是？</label>
+                    <div class="radio-group">
+                        <div class="radio-option"><input type="radio" id="male" name="gender" value="男" required><label for="male">男</label></div>
+                        <div class="radio-option"><input type="radio" id="female" name="gender" value="女" required><label for="female">女</label></div>
+                        <div class="radio-option"><input type="radio" id="secret" name="gender" value="保密" required><label for="secret">保密</label></div>
+                    </div>
+                </div>
+                
+                <!-- 问卷问题 - 合理化后的内容 -->
+                <div class="form-group">
+                    <label for="handsome"><span class="question-number">2</span>你认为我们班级里哪位男生最帅？</label>
+                    <input type="text" id="handsome" name="handsome" placeholder="请输入名字（如果觉得没有，可以填写'无'）" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="beautiful"><span class="question-number">3</span>你认为我们班级里哪位女生最漂亮？</label>
+                    <input type="text" id="beautiful" name="beautiful" placeholder="请输入名字" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crush"><span class="question-number">4</span>你最喜欢的游戏是什么？</label>
+                    <input type="text" id="crush" name="crush" placeholder="请输入你最喜欢的游戏名称" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="romantic"><span class="question-number">5</span>请分享你在"到梦空间"获得的学分数量</label>
+                    <textarea id="romantic" name="romantic" placeholder="请写下你的学分数量，让我们羡慕一下..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="crazy"><span class="question-number">6</span>你最喜欢的美食是什么？</label>
+                    <textarea id="crazy" name="crazy" placeholder="请描述你最喜欢的美食..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fantasy"><span class="question-number">7</span>你想吃饼干吗？如果想吃，请留下你的名字</label>
+                    <textarea id="fantasy" name="fantasy" placeholder="请告诉我们你是否想吃饼干，如果想的话请留下你的名字..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="feeling"><span class="question-number">8</span>你现在有什么感受？</label>
+                    <textarea id="feeling" name="feeling" placeholder="请描述你现在的感受..." required></textarea>
+                </div>
+                
+                <!-- 匿名选项 -->
+                <div class="anonymous-note">
+                    <h3><i class="fas fa-user-secret"></i> 匿名填写</h3>
+                    <p>本问卷默认匿名填写，你的个人信息不会被公开。</p>
+                    <div class="real-name-option"><input type="checkbox" id="real_name_option"><label for="real_name_option">我想实名填写</label></div>
+                    <div class="real-name-field" id="real_name_field"><input type="text" id="real_name" name="real_name" placeholder="请输入你的姓名"></div>
+                </div>
+                
+                <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-paper-plane"></i> 提交问卷</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 视频播放器 -->
+    <div class="video-container" id="videoContainer">
+        <div class="video-loading" id="videoLoading"><i class="fas fa-spinner fa-spin"></i> 视频加载中，请稍候...</div>
+        <video class="video-player" id="videoPlayer" autoplay muted playsinline></video>
+        <div class="video-progress"><div class="video-progress-bar" id="videoProgressBar"></div></div>
+        <div class="video-info">
+            <h2 class="video-title" id="videoTitle">视频标题</h2>
+            <p class="video-description" id="videoDescription">视频描述</p>
+        </div>
+        <div class="video-controls">
+            <button class="video-control-btn" id="replayBtn"><i class="fas fa-redo"></i> 重新播放</button>
+            <button class="video-control-btn" id="closeVideoBtn"><i class="fas fa-times"></i> 关闭视频</button>
+        </div>
+        <div class="video-warning"><p><i class="fas fa-exclamation-circle"></i> 视频播放期间无法跳过或中断，请耐心观看</p></div>
+    </div>
+    
+    <!-- 游戏继续弹窗 -->
+    <div class="game-continue-modal" id="gameContinueModal">
+        <div class="game-continue-content">
+            <h2 class="game-continue-title">恭喜！</h2>
+            <p class="game-continue-description">你已经完成了两次视频观看，是否要继续游戏？点击下方按钮继续体验更多精彩内容！</p>
+            <button class="game-continue-btn" id="continueGameBtn"><i class="fas fa-gamepad"></i> 继续游戏</button>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"><i class="fas fa-check-circle"></i><span>问卷提交成功！感谢你的参与，周三的考试你必定考的都会,蒙的全对！</span></div>
+    
+    <div class="footer"><p>© 256班不挂 | 考试必过</p></div>
+
+    <script>
+        // 配置
+        const CONFIG = {
+            EMAILJS_PUBLIC_KEY: 'rmpp5KK75q7OQLzmC',
+            EMAILJS_SERVICE_ID: 'service_4qddlv8',
+            EMAILJS_TEMPLATE_ID: 'template_on1yz3l',
+            ADMIN_EMAIL: 'blackwhilecolor@Outlook.com'
+        };
+        
+        // 视频数据
+        const VIDEOS = {
+            common: [
+                { id: 1, title: "幸运星星", description: "运气爆棚", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/f857bbfda8b0f309a66aa3ae9b2e4a35.mp4" },
+                { id: 2, title: "考试祝福", description: "祝您在接下来的考试中取得优异成绩", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/68835b71d55c9f14ed54f1d2ba41bb0f.mp4" },
+                { id: 3, title: "班级时光", description: "珍惜班级时光，创造美好回忆", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/7c04581cb3903650f389ce2619114ccf.mp4" }
+            ],
+            female: [
+                { id: 4, title: "美貌与才智并存", description: "六宫粉黛不及你的一笑", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/6f18a13bde76a18fd03c8fadacf4dbab.mp4" },
+                { id: 5, title: "所谓伊人", description: "北方有佳人遗世而独立", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/41caea55eb4ef1ebc1b81104296054bd.mp4" },
+                { id: 6, title: "不施粉黛", description: "一笑倾城再笑倾国·", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/05e731dc55fd0098a3848fe085477939.mp4" }
+            ],
+            other: [
+                { id: 4, title: "特别惊喜", description: "这是为您准备的特别内容", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/6f18a13bde76a18fd03c8fadacf4dbab.mp4" },
+                { id: 5, title: "超级惊喜", description: "专属于你的惊喜", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/41caea55eb4ef1ebc1b81104296054bd.mp4" },
+                { id: 6, title: "头等大奖", description: "燕云普通的梨园", url: "https://raw.githubusercontent.com/12345678666qw/py-0ne/refs/heads/main/05e731dc55fd0098a3848fe085477939.mp4" }
+            ]
+        };
+
+        // 全局变量
+        let preloadedVideo = null;
+        let preloadedVideoData = null;
+        let currentVideoData = null;
+        let videoPlayCount = 0;
+        
+        // 初始化
+        function init() {
+            emailjs.init(CONFIG.EMAILJS_PUBLIC_KEY);
+            
+            // 实名选项切换
+            document.getElementById('real_name_option').addEventListener('change', function() {
+                document.getElementById('real_name_field').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // 性别选择预加载视频
+            document.querySelectorAll('input[name="gender"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    preloadVideoByGender(this.value);
+                });
+            });
+            
+            // 表单提交
+            document.getElementById('surveyForm').addEventListener('submit', handleFormSubmit);
+            
+            // 视频控制按钮
+            document.getElementById('replayBtn').addEventListener('click', replayVideo);
+            document.getElementById('closeVideoBtn').addEventListener('click', closeVideo);
+            
+            // 游戏继续按钮
+            document.getElementById('continueGameBtn').addEventListener('click', continueGame);
+            
+            // 初始化播放计数
+            videoPlayCount = parseInt(localStorage.getItem('videoPlayCount')) || 0;
+        }
+        
+        // 表单提交处理
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在提交...';
+            
+            const formData = new FormData(this);
+            const isRealName = document.getElementById('real_name_option').checked;
+            const realName = isRealName ? document.getElementById('real_name').value : '匿名用户';
+            const gender = formData.get('gender');
+            
+            const templateParams = {
+                to_email: CONFIG.ADMIN_EMAIL,
+                is_real_name: isRealName ? '是' : '否',
+                real_name: realName,
+                submission_date: new Date().toLocaleString('zh-CN'),
+                gender: gender,
+                handsome: formData.get('handsome'),
+                beautiful: formData.get('beautiful'),
+                crush: formData.get('crush'),
+                romantic: formData.get('romantic'),
+                crazy: formData.get('crazy'),
+                fantasy: formData.get('fantasy'),
+                feeling: formData.get('feeling')
+            };
+            
+            emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, templateParams)
+                .then(() => {
+                    showNotification('问卷提交成功！感谢你的参与,周三的考试你必定考的都会,蒙的全对！', 'success');
+                    document.getElementById('surveyForm').reset();
+                    document.getElementById('real_name_field').style.display = 'none';
+                    document.getElementById('real_name_option').checked = false;
+                    
+                    setTimeout(() => playPreloadedVideo(gender), 1500);
+                })
+                .catch(error => {
+                    showNotification(`提交失败，请稍后重试。错误详情: ${error.text || ''}`, 'error');
+                    setTimeout(() => playPreloadedVideo(gender), 1500);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> 提交问卷';
+                });
+        }
+        
+        // 预加载视频
+        function preloadVideoByGender(gender) {
+            const preloadIndicator = document.getElementById('preloadIndicator');
+            preloadIndicator.classList.add('active');
+            
+            const storageKey = `playedVideos_${gender === '女' ? 'female' : 'other'}`;
+            let playedVideos = JSON.parse(localStorage.getItem(storageKey)) || [];
+            
+            // 选择视频池
+            const videoPool = playedVideos.length === 0 ? VIDEOS.common : 
+                            (gender === '女' ? VIDEOS.female : VIDEOS.other);
+            
+            // 获取未播放视频
+            let unplayedVideos = videoPool.filter(video => !playedVideos.includes(video.id));
+            if (unplayedVideos.length === 0) {
+                playedVideos = [];
+                localStorage.setItem(storageKey, JSON.stringify(playedVideos));
+                unplayedVideos = videoPool.filter(video => !playedVideos.includes(video.id));
+            }
+            
+            // 随机选择视频
+            const selectedVideo = unplayedVideos[Math.floor(Math.random() * unplayedVideos.length)];
+            
+            // 预加载
+            preloadedVideo = new Audio();
+            preloadedVideo.preload = "auto";
+            preloadedVideo.src = selectedVideo.url;
+            preloadedVideoData = selectedVideo;
+            
+            preloadedVideo.addEventListener('canplaythrough', () => {
+                preloadIndicator.classList.remove('active');
+            });
+            
+            preloadedVideo.addEventListener('error', () => {
+                preloadIndicator.classList.remove('active');
+            });
+        }
+        
+        // 播放预加载视频
+        function playPreloadedVideo(gender) {
+            if (!preloadedVideo || !preloadedVideoData) {
+                playNonRepeatingVideo(gender);
+                return;
+            }
+            
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoContainer = document.getElementById('videoContainer');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoDescription = document.getElementById('videoDescription');
+            
+            currentVideoData = preloadedVideoData;
+            videoTitle.textContent = preloadedVideoData.title;
+            videoDescription.textContent = preloadedVideoData.description;
+            videoPlayer.src = preloadedVideoData.url;
+            videoContainer.classList.add('active');
+            
+            // 更新播放记录
+            const storageKey = `playedVideos_${gender === '女' ? 'female' : 'other'}`;
+            let playedVideos = JSON.parse(localStorage.getItem(storageKey)) || [];
+            playedVideos.push(preloadedVideoData.id);
+            localStorage.setItem(storageKey, JSON.stringify(playedVideos));
+            
+            // 事件监听
+            videoPlayer.addEventListener('timeupdate', updateVideoProgress);
+            videoPlayer.addEventListener('ended', () => {
+                // 视频结束后显示控制按钮
+                document.getElementById('replayBtn').style.display = 'block';
+                
+                // 增加播放计数
+                videoPlayCount++;
+                localStorage.setItem('videoPlayCount', videoPlayCount);
+                
+                // 检查是否需要显示游戏继续弹窗
+                if (videoPlayCount >= 2) {
+                    setTimeout(() => {
+                        document.getElementById('gameContinueModal').classList.add('active');
+                    }, 1000);
+                }
+            });
+            
+            videoContainer.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                if (videoContainer.classList.contains('active') && [32, 37, 39].includes(e.keyCode)) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, false);
+            
+            videoPlayer.controls = false;
+            videoPlayer.addEventListener('click', e => e.preventDefault());
+            
+            // 尝试播放
+            videoPlayer.play().then(() => {
+                videoPlayer.muted = false;
+            }).catch(() => {
+                showNotification('请点击屏幕以播放视频', 'error');
+                videoContainer.addEventListener('click', function playOnClick() {
+                    videoPlayer.play();
+                    videoContainer.removeEventListener('click', playOnClick);
+                });
+            });
+        }
+        
+        // 备用播放方式
+        function playNonRepeatingVideo(gender) {
+            const storageKey = `playedVideos_${gender === '女' ? 'female' : 'other'}`;
+            let playedVideos = JSON.parse(localStorage.getItem(storageKey)) || [];
+            
+            const videoPool = playedVideos.length === 0 ? VIDEOS.common : 
+                            (gender === '女' ? VIDEOS.female : VIDEOS.other);
+            
+            let unplayedVideos = videoPool.filter(video => !playedVideos.includes(video.id));
+            if (unplayedVideos.length === 0) {
+                playedVideos = [];
+                localStorage.setItem(storageKey, JSON.stringify(playedVideos));
+                unplayedVideos = videoPool.filter(video => !playedVideos.includes(video.id));
+            }
+            
+            const selectedVideo = unplayedVideos[Math.floor(Math.random() * unplayedVideos.length)];
+            playedVideos.push(selectedVideo.id);
+            localStorage.setItem(storageKey, JSON.stringify(playedVideos));
+            
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoContainer = document.getElementById('videoContainer');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoDescription = document.getElementById('videoDescription');
+            const videoLoading = document.getElementById('videoLoading');
+            
+            currentVideoData = selectedVideo;
+            videoTitle.textContent = selectedVideo.title;
+            videoDescription.textContent = selectedVideo.description;
+            videoPlayer.src = selectedVideo.url;
+            videoContainer.classList.add('active');
+            videoLoading.classList.add('active');
+            
+            videoPlayer.addEventListener('loadeddata', () => videoLoading.classList.remove('active'));
+            videoPlayer.addEventListener('error', () => {
+                videoLoading.classList.remove('active');
+                showNotification('视频加载失败，请检查网络连接', 'error');
+                setTimeout(() => videoContainer.classList.remove('active'), 3000);
+            });
+            
+            videoPlayer.addEventListener('timeupdate', updateVideoProgress);
+            videoPlayer.addEventListener('ended', () => {
+                // 视频结束后显示控制按钮
+                document.getElementById('replayBtn').style.display = 'block';
+                
+                // 增加播放计数
+                videoPlayCount++;
+                localStorage.setItem('videoPlayCount', videoPlayCount);
+                
+                // 检查是否需要显示游戏继续弹窗
+                if (videoPlayCount >= 2) {
+                    setTimeout(() => {
+                        document.getElementById('gameContinueModal').classList.add('active');
+                    }, 1000);
+                }
+            });
+            
+            videoContainer.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', e => {
+                if (videoContainer.classList.contains('active') && [32, 37, 39].includes(e.keyCode)) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, false);
+            
+            videoPlayer.controls = false;
+            videoPlayer.addEventListener('click', e => e.preventDefault());
+            
+            videoPlayer.play().then(() => {
+                videoPlayer.muted = false;
+            }).catch(() => {
+                showNotification('请点击屏幕以播放视频', 'error');
+                videoContainer.addEventListener('click', function playOnClick() {
+                    videoPlayer.play();
+                    videoContainer.removeEventListener('click', playOnClick);
+                });
+            });
+        }
+        
+        // 重新播放视频
+        function replayVideo() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.currentTime = 0;
+            videoPlayer.play();
+            document.getElementById('replayBtn').style.display = 'none';
+        }
+        
+        // 关闭视频
+        function closeVideo() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const videoContainer = document.getElementById('videoContainer');
+            
+            videoPlayer.pause();
+            videoContainer.classList.remove('active');
+            document.getElementById('replayBtn').style.display = 'none';
+        }
+        
+        // 继续游戏
+        function continueGame() {
+            document.getElementById('gameContinueModal').classList.remove('active');
+            // 跳转到指定链接
+            window.location.href = 'https://zhuanpan.fxgqc.top/';
+        }
+        
+        // 更新进度条
+        function updateVideoProgress() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            const progressBar = document.getElementById('videoProgressBar');
+            const progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+        
+        // 显示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = notification.querySelector('i');
+            const text = notification.querySelector('span');
+            
+            text.textContent = message;
+            
+            if (type === 'error') {
+                notification.classList.add('error');
+                icon.className = 'fas fa-exclamation-circle';
+            } else {
+                notification.classList.remove('error');
+                icon.className = 'fas fa-check-circle';
+            }
+            
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 5000);
+        }
+        
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
