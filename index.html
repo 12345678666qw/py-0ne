@@ -81,10 +81,65 @@
             }
         }
         
+        /* 音乐播放按钮 */
+        .music-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .music-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .music-button:active {
+            transform: scale(0.95);
+        }
+        
+        .music-icon {
+            font-size: 32px;
+            color: white;
+        }
+        
+        .music-button.playing .music-icon {
+            color: #4cd964;
+            text-shadow: 0 0 10px rgba(76, 217, 100, 0.5);
+        }
+        
+        .music-button.muted .music-icon {
+            color: #ff3b30;
+        }
+        
         /* 移动设备优化 */
         @media (max-width: 768px) {
             .new-year-text {
                 font-size: 18vw;
+            }
+            
+            .music-button {
+                width: 60px;
+                height: 60px;
+                bottom: 20px;
+                right: 20px;
+            }
+            
+            .music-icon {
+                font-size: 28px;
             }
         }
         
@@ -95,6 +150,17 @@
             }
             .new-year-text {
                 font-size: 15vh;
+            }
+            
+            .music-button {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .music-icon {
+                font-size: 24px;
             }
         }
         
@@ -132,12 +198,34 @@
                 transform: translateY(0) scale(1);
             }
         }
+        
+        /* 按钮入场动画 */
+        .music-button {
+            opacity: 0;
+            animation: buttonAppear 1s ease-out 2s forwards;
+        }
+        
+        @keyframes buttonAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 <body>
     <canvas id="fireworksCanvas"></canvas>
     <div class="text-container">
         <div class="new-year-text" id="newYearText"></div>
+    </div>
+    
+    <!-- 音乐播放按钮 -->
+    <div class="music-button" id="musicButton">
+        <div class="music-icon">♪</div>
     </div>
 
     <script>
@@ -148,7 +236,9 @@
         // ============ 音乐系统 ============
         let backgroundMusic = null;
         let isMusicPlaying = false;
+        let isMusicLoaded = false;
         let musicVolume = 0.7;
+        let musicButton = document.getElementById('musicButton');
         
         function initMusic() {
             backgroundMusic = new Audio(MUSIC_PATH);
@@ -159,36 +249,100 @@
             // 音乐加载成功时
             backgroundMusic.addEventListener('canplaythrough', function() {
                 console.log('音乐加载成功');
+                isMusicLoaded = true;
+                // 尝试自动播放
+                tryAutoPlay();
             });
             
             // 音乐加载失败时
             backgroundMusic.addEventListener('error', function(e) {
                 console.log('音乐加载失败，请检查文件路径: ' + MUSIC_PATH);
+                // 将按钮改为静音状态
+                musicButton.classList.add('muted');
+                musicButton.title = "音乐加载失败";
             });
             
-            // 用户交互后自动播放
+            // 监听播放状态
+            backgroundMusic.addEventListener('play', function() {
+                console.log('音乐开始播放');
+                isMusicPlaying = true;
+                musicButton.classList.remove('muted');
+                musicButton.classList.add('playing');
+                musicButton.title = "正在播放音乐";
+            });
+            
+            backgroundMusic.addEventListener('pause', function() {
+                console.log('音乐已暂停');
+                isMusicPlaying = false;
+                musicButton.classList.remove('playing');
+                musicButton.title = "点击播放音乐";
+            });
+            
+            // 音乐按钮点击事件
+            musicButton.addEventListener('click', function() {
+                toggleMusic();
+            });
+            
+            // 页面点击事件（用于解决浏览器自动播放限制）
             document.addEventListener('click', function() {
-                if (backgroundMusic && !isMusicPlaying) {
-                    playMusic();
+                if (!isMusicPlaying && isMusicLoaded) {
+                    tryAutoPlay();
                 }
             }, { once: true });
             
             document.addEventListener('keydown', function() {
-                if (backgroundMusic && !isMusicPlaying) {
-                    playMusic();
+                if (!isMusicPlaying && isMusicLoaded) {
+                    tryAutoPlay();
                 }
             }, { once: true });
+            
+            // 空格键控制音乐播放
+            document.addEventListener('keydown', function(e) {
+                if (e.key === ' ' && isMusicLoaded) {
+                    e.preventDefault();
+                    toggleMusic();
+                }
+            });
         }
         
-        function playMusic() {
+        function tryAutoPlay() {
+            if (!isMusicLoaded || isMusicPlaying) return;
+            
+            playMusic().then(success => {
+                if (!success) {
+                    // 自动播放失败，显示提示
+                    musicButton.title = "点击播放音乐";
+                }
+            });
+        }
+        
+        async function playMusic() {
+            if (!backgroundMusic || !isMusicLoaded) return false;
+            
+            try {
+                await backgroundMusic.play();
+                console.log('音乐播放成功');
+                return true;
+            } catch (e) {
+                console.log('音乐播放失败:', e);
+                return false;
+            }
+        }
+        
+        function pauseMusic() {
             if (!backgroundMusic) return;
             
-            backgroundMusic.play().then(() => {
-                console.log('音乐播放成功');
-                isMusicPlaying = true;
-            }).catch(e => {
-                console.log('音乐播放失败:', e);
-            });
+            backgroundMusic.pause();
+        }
+        
+        function toggleMusic() {
+            if (!isMusicLoaded) return;
+            
+            if (isMusicPlaying) {
+                pauseMusic();
+            } else {
+                playMusic();
+            }
         }
         
         // ============ 烟花系统 ============
@@ -467,16 +621,9 @@
             // 开始自动燃放烟花
             startAutoFire();
             
-            // 尝试自动播放音乐
-            setTimeout(() => {
-                if (backgroundMusic && !isMusicPlaying) {
-                    playMusic();
-                }
-            }, 500);
-            
             // 点击页面时播放音乐（解决浏览器自动播放限制）
             canvas.addEventListener('click', function(event) {
-                if (backgroundMusic && !isMusicPlaying) {
+                if (!isMusicPlaying && isMusicLoaded) {
                     playMusic();
                 }
                 
