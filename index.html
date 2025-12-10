@@ -99,6 +99,8 @@
             align-items: center;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            animation: buttonAppear 1s ease-out 3s forwards;
         }
         
         .music-button:hover {
@@ -199,12 +201,6 @@
             }
         }
         
-        /* 按钮入场动画 */
-        .music-button {
-            opacity: 0;
-            animation: buttonAppear 1s ease-out 2s forwards;
-        }
-        
         @keyframes buttonAppear {
             from {
                 opacity: 0;
@@ -215,9 +211,64 @@
                 transform: scale(1);
             }
         }
+        
+        /* 启动提示 */
+        .start-hint {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2rem;
+            z-index: 100;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+        
+        .start-hint.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .start-content {
+            text-align: center;
+            padding: 30px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .countdown {
+            font-size: 3rem;
+            color: #ffdd00;
+            margin: 20px 0;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
+    <!-- 启动提示 -->
+    <div class="start-hint" id="startHint">
+        <div class="start-content">
+            <div>新年快乐！</div>
+            <div class="countdown" id="countdown">3</div>
+            <div>音乐与烟花即将开始</div>
+        </div>
+    </div>
+    
     <canvas id="fireworksCanvas"></canvas>
     <div class="text-container">
         <div class="new-year-text" id="newYearText"></div>
@@ -233,13 +284,57 @@
         // 请将您的音乐文件放在与HTML文件同目录的 "music" 文件夹中，并命名为 "new-year.mp3"
         const MUSIC_PATH = 'music/new-year.mp3';
         
-        // ============ 音乐系统 ============
+        // ============ 全局变量 ============
         let backgroundMusic = null;
         let isMusicPlaying = false;
         let isMusicLoaded = false;
         let musicVolume = 0.7;
-        let musicButton = document.getElementById('musicButton');
+        let isStarted = false;
         
+        // ============ 页面元素 ============
+        const startHint = document.getElementById('startHint');
+        const countdownElement = document.getElementById('countdown');
+        const musicButton = document.getElementById('musicButton');
+        
+        // ============ 启动倒计时 ============
+        function startCountdown() {
+            let countdown = 3;
+            
+            const countdownInterval = setInterval(() => {
+                countdownElement.textContent = countdown;
+                countdown--;
+                
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    startEverything();
+                }
+            }, 1000);
+        }
+        
+        // ============ 启动所有效果 ============
+        function startEverything() {
+            if (isStarted) return;
+            isStarted = true;
+            
+            // 隐藏启动提示
+            startHint.classList.add('hidden');
+            
+            // 显示新年快乐文字
+            showNewYearText();
+            
+            // 启动烟花系统
+            startFireworks();
+            
+            // 启动音乐系统
+            startMusic();
+            
+            // 设置3秒后显示音乐按钮
+            setTimeout(() => {
+                musicButton.style.opacity = 1;
+            }, 3000);
+        }
+        
+        // ============ 音乐系统 ============
         function initMusic() {
             backgroundMusic = new Audio(MUSIC_PATH);
             backgroundMusic.loop = true;
@@ -250,14 +345,11 @@
             backgroundMusic.addEventListener('canplaythrough', function() {
                 console.log('音乐加载成功');
                 isMusicLoaded = true;
-                // 尝试自动播放
-                tryAutoPlay();
             });
             
             // 音乐加载失败时
             backgroundMusic.addEventListener('error', function(e) {
                 console.log('音乐加载失败，请检查文件路径: ' + MUSIC_PATH);
-                // 将按钮改为静音状态
                 musicButton.classList.add('muted');
                 musicButton.title = "音乐加载失败";
             });
@@ -283,19 +375,6 @@
                 toggleMusic();
             });
             
-            // 页面点击事件（用于解决浏览器自动播放限制）
-            document.addEventListener('click', function() {
-                if (!isMusicPlaying && isMusicLoaded) {
-                    tryAutoPlay();
-                }
-            }, { once: true });
-            
-            document.addEventListener('keydown', function() {
-                if (!isMusicPlaying && isMusicLoaded) {
-                    tryAutoPlay();
-                }
-            }, { once: true });
-            
             // 空格键控制音乐播放
             document.addEventListener('keydown', function(e) {
                 if (e.key === ' ' && isMusicLoaded) {
@@ -305,9 +384,10 @@
             });
         }
         
-        function tryAutoPlay() {
-            if (!isMusicLoaded || isMusicPlaying) return;
+        function startMusic() {
+            if (!isMusicLoaded) return;
             
+            // 尝试播放音乐
             playMusic().then(success => {
                 if (!success) {
                     // 自动播放失败，显示提示
@@ -346,19 +426,7 @@
         }
         
         // ============ 烟花系统 ============
-        const canvas = document.getElementById('fireworksCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        // 设置Canvas尺寸
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-        
-        // 烟花系统变量
+        let canvas, ctx;
         let fireworks = [];
         let particles = [];
         let autoFireInterval;
@@ -378,6 +446,20 @@
             {hue: 45, saturation: 100, lightness: 70},
             {hue: 300, saturation: 100, lightness: 70}
         ];
+        
+        function initFireworks() {
+            canvas = document.getElementById('fireworksCanvas');
+            ctx = canvas.getContext('2d');
+            
+            // 设置Canvas尺寸
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
         
         // 随机数生成函数
         function random(min, max) {
@@ -534,7 +616,6 @@
             fireworks.push(new EnhancedFirework(x, targetY, colorConfig, size));
         }
         
-        // 开始自动燃放
         function startAutoFire() {
             if (isAutoFiring) return;
             
@@ -590,6 +671,11 @@
             requestAnimationFrame(animate);
         }
         
+        function startFireworks() {
+            animate();
+            startAutoFire();
+        }
+        
         // ============ 新年快乐文字动画 ============
         function showNewYearText() {
             const newYearText = document.getElementById('newYearText');
@@ -609,25 +695,32 @@
         
         // ============ 页面加载初始化 ============
         function init() {
-            // 初始化音乐
+            // 初始化烟花系统
+            initFireworks();
+            
+            // 初始化音乐系统
             initMusic();
             
-            // 显示新年快乐文字
-            showNewYearText();
+            // 开始倒计时
+            startCountdown();
             
-            // 启动动画循环
-            animate();
-            
-            // 开始自动燃放烟花
-            startAutoFire();
-            
-            // 点击页面时播放音乐（解决浏览器自动播放限制）
-            canvas.addEventListener('click', function(event) {
-                if (!isMusicPlaying && isMusicLoaded) {
-                    playMusic();
+            // 点击页面任意位置也可以启动
+            document.addEventListener('click', function() {
+                if (!isStarted) {
+                    startEverything();
                 }
-                
-                // 点击位置发射超大烟花
+            });
+            
+            // 空格键也可以启动
+            document.addEventListener('keydown', function(e) {
+                if (!isStarted && e.key === ' ') {
+                    e.preventDefault();
+                    startEverything();
+                }
+            });
+            
+            // 点击页面时发射烟花
+            canvas.addEventListener('click', function(event) {
                 const rect = canvas.getBoundingClientRect();
                 const x = event.clientX - rect.left;
                 const targetY = random(canvas.height * 0.2, canvas.height * 0.4);
