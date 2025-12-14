@@ -287,6 +287,10 @@
         const submitNameBtn = document.getElementById('submitName');
         const finalText = document.getElementById('finalText');
         
+        // 检测是否为移动端
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        const particleMultiplier = isMobile ? 0.6 : 1; // 移动端粒子数量减少40%
+        
         // 性能优化：缓存DOM操作
         const setOpacity = (element, value) => element.style.opacity = value;
         const setDisplay = (element, value) => element.style.display = value;
@@ -379,7 +383,7 @@
             }
         });
         
-        // 烟花系统 - 增强真实感优化版
+        // 烟花系统 - 移动端优化版（减少粒子数量）
         function initFireworks() {
             const canvas = document.getElementById('fireworksCanvas');
             const ctx = canvas.getContext('2d', { alpha: true });
@@ -468,7 +472,6 @@
                 FIRE_TREE: 'fire_tree',
                 ELLIPSE: 'ellipse',
                 CHRYSANTHEMUM: 'chrysanthemum',
-                // 移除了MOON: 'moon',
                 
                 // 参数方程模式
                 PARAMETRIC_CIRCLE: 'parametric_circle',
@@ -574,8 +577,9 @@
                 }
                 
                 createHeartParticles() {
-                    // 简化粒子数量，减少性能消耗
-                    const particleCount = randomInt(120, 180);
+                    // 移动端减少粒子数量
+                    const baseCount = isMobile ? randomInt(70, 110) : randomInt(120, 180);
+                    const particleCount = Math.floor(baseCount * particleMultiplier);
                     
                     for (let i = 0; i < particleCount; i++) {
                         const t = (i / particleCount) * Math.PI * 2;
@@ -773,8 +777,8 @@
                         }
                     }
                     
-                    if (this.trailParticles.length > 25) {
-                        this.trailParticles.splice(0, this.trailParticles.length - 20);
+                    if (this.trailParticles.length > (isMobile ? 15 : 25)) {
+                        this.trailParticles.splice(0, this.trailParticles.length - (isMobile ? 12 : 20));
                     }
                     
                     return this.life > 0 && this.y < canvas.height + 45;
@@ -959,8 +963,8 @@
                         }
                     }
                     
-                    if (this.sparkParticles.length > 12) {
-                        this.sparkParticles.splice(0, this.sparkParticles.length - 10);
+                    if (this.sparkParticles.length > (isMobile ? 8 : 12)) {
+                        this.sparkParticles.splice(0, this.sparkParticles.length - (isMobile ? 6 : 10));
                     }
                     
                     return this.life > 0 && this.y < canvas.height + 70;
@@ -1130,7 +1134,7 @@
                         this.currentSize *= 1 + Math.sin(Date.now() * 0.007 + this.sparklePhase) * this.sparkleFactor;
                     }
                     
-                    if (Math.random() < 0.18) {
+                    if (Math.random() < (isMobile ? 0.12 : 0.18)) {
                         this.tailParticles.push(new ChrysanthemumTailParticle(
                             this.x,
                             this.y,
@@ -1145,8 +1149,8 @@
                         }
                     }
                     
-                    if (this.tailParticles.length > 8) {
-                        this.tailParticles.splice(0, this.tailParticles.length - 7);
+                    if (this.tailParticles.length > (isMobile ? 6 : 8)) {
+                        this.tailParticles.splice(0, this.tailParticles.length - (isMobile ? 5 : 7));
                     }
                     
                     return this.life > 0 && this.y < canvas.height + 75;
@@ -1396,7 +1400,7 @@
                     this.sparkleFactor = explosionPattern.includes('SPARKLE') ? random(0.1, 0.26) : 0;
                     this.sparklePhase = random(0, Math.PI * 2);
                     
-                    this.secondaryExplosionChance = 0.02;
+                    this.secondaryExplosionChance = isMobile ? 0.01 : 0.02; // 移动端减少次级爆炸概率
                     
                     this.createdAt = Date.now();
                     
@@ -1561,7 +1565,7 @@
                 }
                 
                 createSecondaryExplosion() {
-                    const secondaryCount = randomInt(4, 12);
+                    const secondaryCount = isMobile ? randomInt(2, 8) : randomInt(4, 12);
                     for (let i = 0; i < secondaryCount; i++) {
                         const secondaryParticle = new Particle(
                             this.x,
@@ -1624,7 +1628,7 @@
                 }
             }
             
-            // 烟花类 - 修改：增加多次爆炸的概率
+            // 烟花类 - 移动端优化：减少爆炸次数
             class Firework {
                 constructor(x, targetY, colorConfig) {
                     this.x = x;
@@ -1644,9 +1648,9 @@
                     
                     this.createdAt = Date.now();
                     
-                    // 修改：增加爆炸次数
+                    // 移动端减少爆炸次数
                     this.explosionCount = 0;
-                    this.maxExplosions = randomInt(3, 6); // 从2-4增加到3-6
+                    this.maxExplosions = isMobile ? randomInt(2, 4) : randomInt(3, 6);
                     
                     this.playLaunchSound();
                 }
@@ -1693,12 +1697,13 @@
                     this.exploded = true;
                     this.explosionCount++;
                     
-                    // 修改：增加初始爆炸威力
-                    this.createExplosion(this.x, this.y, this.explosionPower * 1.2, this.explosionPattern);
+                    // 移动端减少爆炸威力
+                    const powerMultiplier = isMobile ? 1.0 : 1.2;
+                    this.createExplosion(this.x, this.y, this.explosionPower * powerMultiplier, this.explosionPattern);
                     
-                    // 修改：减少后续爆炸延迟，增加爆炸次数
+                    // 移动端减少后续爆炸次数和延迟
                     if (this.explosionCount < this.maxExplosions) {
-                        const nextExplosionDelay = random(120, 350); // 从170-420减少到120-350
+                        const nextExplosionDelay = isMobile ? random(150, 400) : random(120, 350);
                         setTimeout(() => {
                             this.createSubsequentExplosion();
                         }, nextExplosionDelay);
@@ -1714,19 +1719,19 @@
                     const newX = this.x + Math.cos(angle) * distance;
                     const newY = this.y + Math.sin(angle) * distance;
                     
-                    // 修改：后续爆炸威力略微降低但保持可观
-                    const subExplosionPower = this.explosionPower * random(0.6, 0.9);
+                    // 移动端减少后续爆炸威力
+                    const subExplosionPower = this.explosionPower * (isMobile ? random(0.5, 0.8) : random(0.6, 0.9));
                     
                     this.createExplosion(newX, newY, subExplosionPower, this.explosionPattern);
                     
-                    // 修改：增加更多后续爆炸的机会
+                    // 移动端减少额外爆炸机会
                     if (this.explosionCount < this.maxExplosions) {
-                        const nextExplosionDelay = random(120, 350);
+                        const nextExplosionDelay = isMobile ? random(150, 400) : random(120, 350);
                         setTimeout(() => {
                             this.createSubsequentExplosion();
                         }, nextExplosionDelay);
-                    } else if (Math.random() < 0.3 && this.explosionCount < this.maxExplosions + 2) {
-                        // 30%的几率额外增加1-2次爆炸
+                    } else if (!isMobile && Math.random() < 0.3 && this.explosionCount < this.maxExplosions + 2) {
+                        // PC端30%的几率额外增加1-2次爆炸，移动端不增加
                         const extraDelay = random(150, 400);
                         setTimeout(() => {
                             this.createSubsequentExplosion();
@@ -1736,7 +1741,7 @@
                 }
                 
                 createExplosion(x, y, power, pattern) {
-                    // 移除了月亮爆炸的创建
+                    // 移动端减少所有爆炸类型的粒子数量
                     if (pattern === EXPLOSION_PATTERNS.HEART) {
                         heartExplosions.push(new HeartExplosionManager(x, y, this.colorConfig, power));
                         return;
@@ -1766,7 +1771,9 @@
                 }
                 
                 createParametricSpiral(x, y, power) {
-                    const particleCount = randomInt(60, 100);
+                    // 移动端减少粒子数量
+                    const baseParticleCount = isMobile ? randomInt(40, 70) : randomInt(60, 100);
+                    const particleCount = Math.floor(baseParticleCount * particleMultiplier);
                     
                     for (let i = 0; i < particleCount; i++) {
                         particles.push(new ParametricSpiralParticle(
@@ -1777,7 +1784,8 @@
                         ));
                     }
                     
-                    const centerCount = randomInt(20, 40);
+                    const baseCenterCount = isMobile ? randomInt(12, 25) : randomInt(20, 40);
+                    const centerCount = Math.floor(baseCenterCount * particleMultiplier);
                     for (let i = 0; i < centerCount; i++) {
                         const angle = random(0, Math.PI * 2);
                         const speed = random(80, 180) * power;
@@ -1797,7 +1805,9 @@
                 }
                 
                 createMeteorShower(x, y, power) {
-                    const meteorCount = randomInt(9, 16);
+                    // 移动端减少流星数量
+                    const baseMeteorCount = isMobile ? randomInt(6, 12) : randomInt(9, 16);
+                    const meteorCount = Math.floor(baseMeteorCount * particleMultiplier);
                     
                     for (let i = 0; i < meteorCount; i++) {
                         const meteor = new Meteor(
@@ -1809,7 +1819,8 @@
                         particles.push(meteor);
                     }
                     
-                    const sparkCount = randomInt(22, 45);
+                    const baseSparkCount = isMobile ? randomInt(15, 30) : randomInt(22, 45);
+                    const sparkCount = Math.floor(baseSparkCount * particleMultiplier);
                     for (let i = 0; i < sparkCount; i++) {
                         const spark = new Particle(
                             x + random(-45, 45),
@@ -1825,7 +1836,9 @@
                 }
                 
                 createFireTree(x, y, power) {
-                    const treeCount = randomInt(45, 75);
+                    // 移动端减少火树数量
+                    const baseTreeCount = isMobile ? randomInt(30, 50) : randomInt(45, 75);
+                    const treeCount = Math.floor(baseTreeCount * particleMultiplier);
                     
                     for (let i = 0; i < treeCount; i++) {
                         const fireTreeParticle = new FireTreeParticle(
@@ -1838,7 +1851,8 @@
                         particles.push(fireTreeParticle);
                     }
                     
-                    const sparkCount = randomInt(25, 45);
+                    const baseSparkCount = isMobile ? randomInt(15, 30) : randomInt(25, 45);
+                    const sparkCount = Math.floor(baseSparkCount * particleMultiplier);
                     for (let i = 0; i < sparkCount; i++) {
                         const spark = new Particle(
                             x + random(-32, 32),
@@ -1855,7 +1869,9 @@
                 }
                 
                 createChrysanthemum(x, y, power) {
-                    const particleCount = randomInt(110, 170);
+                    // 移动端减少彩菊粒子数量
+                    const baseParticleCount = isMobile ? randomInt(70, 110) : randomInt(110, 170);
+                    const particleCount = Math.floor(baseParticleCount * particleMultiplier);
                     
                     for (let i = 0; i < particleCount; i++) {
                         particles.push(new ChrysanthemumParticle(
@@ -1866,7 +1882,7 @@
                         ));
                     }
                     
-                    const sparkCount = Math.floor(particleCount * 0.35);
+                    const sparkCount = Math.floor(particleCount * (isMobile ? 0.25 : 0.35));
                     for (let i = 0; i < sparkCount; i++) {
                         const spark = new ChrysanthemumParticle(
                             x + random(-13, 13),
@@ -1881,7 +1897,9 @@
                 }
                 
                 createNormalExplosion(x, y, power, pattern) {
-                    const particleCount = this.getParticleCountByPattern(pattern);
+                    // 移动端减少普通爆炸粒子数量
+                    const baseParticleCount = this.getParticleCountByPattern(pattern);
+                    const particleCount = Math.floor(baseParticleCount * particleMultiplier);
                     
                     for (let i = 0; i < particleCount; i++) {
                         particles.push(new Particle(
@@ -1893,7 +1911,7 @@
                         ));
                     }
                     
-                    const sparkCount = Math.floor(particleCount * 0.35);
+                    const sparkCount = Math.floor(particleCount * (isMobile ? 0.25 : 0.35));
                     for (let i = 0; i < sparkCount; i++) {
                         const spark = new Particle(
                             x + random(-14, 14),
@@ -1909,27 +1927,30 @@
                 }
                 
                 getParticleCountByPattern(pattern) {
+                    // 移动端减少所有模式的粒子基数
+                    const mobileFactor = isMobile ? 0.7 : 1;
+                    
                     switch(pattern) {
                         case EXPLOSION_PATTERNS.CIRCLE:
-                            return randomInt(85, 130);
+                            return Math.floor(randomInt(85, 130) * mobileFactor);
                         case EXPLOSION_PATTERNS.SPARKLE:
-                            return randomInt(95, 150);
+                            return Math.floor(randomInt(95, 150) * mobileFactor);
                         case EXPLOSION_PATTERNS.VORTEX:
-                            return randomInt(90, 140);
+                            return Math.floor(randomInt(90, 140) * mobileFactor);
                         case EXPLOSION_PATTERNS.RAINBOW:
-                            return randomInt(115, 170);
+                            return Math.floor(randomInt(115, 170) * mobileFactor);
                         case EXPLOSION_PATTERNS.ELLIPSE:
-                            return randomInt(65, 115);
+                            return Math.floor(randomInt(65, 115) * mobileFactor);
                         case EXPLOSION_PATTERNS.PARAMETRIC_CIRCLE:
-                            return randomInt(100, 150);
+                            return Math.floor(randomInt(100, 150) * mobileFactor);
                         case EXPLOSION_PATTERNS.PARAMETRIC_ELLIPSE:
-                            return randomInt(80, 130);
+                            return Math.floor(randomInt(80, 130) * mobileFactor);
                         case EXPLOSION_PATTERNS.PARAMETRIC_STAR:
-                            return randomInt(120, 180);
+                            return Math.floor(randomInt(120, 180) * mobileFactor);
                         case EXPLOSION_PATTERNS.SPIRAL_PARAMETRIC:
-                            return randomInt(60, 100);
+                            return Math.floor(randomInt(60, 100) * mobileFactor);
                         default:
-                            return randomInt(65, 115);
+                            return Math.floor(randomInt(65, 115) * mobileFactor);
                     }
                 }
                 
@@ -1971,50 +1992,68 @@
                 fireworks.push(new Firework(x, targetY, colorConfig));
             }
             
-            // 创建特殊烟花
+            // 创建特殊烟花 - 移动端减少特殊烟花概率
             function createSpecialFirework() {
-                if (Math.random() < 0.5) return; // 从0.65降低到0.5，增加特殊烟花概率
+                if (isMobile && Math.random() < 0.7) return; // 移动端70%不创建特殊烟花
+                if (!isMobile && Math.random() < 0.5) return;
                 
                 const x = random(100, canvas.width - 100);
                 const targetY = random(canvas.height * 0.15, canvas.height * 0.32);
                 const colorConfig = getRandomColorConfig();
                 
                 const specialFirework = new Firework(x, targetY, colorConfig);
-                specialFirework.explosionPower *= 1.45;
-                specialFirework.maxExplosions = randomInt(4, 8); // 从3-5增加到4-8
+                specialFirework.explosionPower *= isMobile ? 1.2 : 1.45;
+                specialFirework.maxExplosions = isMobile ? randomInt(3, 5) : randomInt(4, 8);
                 fireworks.push(specialFirework);
             }
             
-            // 自动发射系统 - 修改：增加爆炸频率
+            // 自动发射系统 - 移动端减少发射频率
             function startAutoFire() {
                 if (isAutoFiring) return;
                 
                 isAutoFiring = true;
                 
-                // 初始发射更多的烟花
+                // 初始发射烟花数量根据设备调整
                 setTimeout(() => createRandomFirework(), 300);
                 setTimeout(() => createRandomFirework(), 600);
-                setTimeout(() => createSpecialFirework(), 900);
+                if (!isMobile || Math.random() > 0.5) {
+                    setTimeout(() => createSpecialFirework(), 900);
+                }
                 setTimeout(() => createRandomFirework(), 1200);
                 setTimeout(() => createRandomFirework(), 1500);
                 
                 autoFireInterval = setInterval(() => {
                     const now = Date.now();
-                    if (now - lastFireworkTime > 900) { // 从1100减少到900
-                        // 增加每次发射的烟花数量
-                        const count = Math.random() > 0.3 ? 3 : (Math.random() > 0.5 ? 2 : 1);
+                    const fireworkInterval = isMobile ? 1100 : 900;
+                    if (now - lastFireworkTime > fireworkInterval) {
+                        // 移动端减少每次发射的烟花数量
+                        let count;
+                        if (isMobile) {
+                            count = Math.random() > 0.6 ? 2 : 1;
+                        } else {
+                            count = Math.random() > 0.3 ? 3 : (Math.random() > 0.5 ? 2 : 1);
+                        }
+                        
                         for (let i = 0; i < count; i++) {
                             setTimeout(() => {
-                                if (Math.random() > 0.6) { // 从0.75降低到0.6，增加特殊烟花概率
-                                    createSpecialFirework();
+                                if (isMobile) {
+                                    if (Math.random() > 0.8) { // 移动端只有20%概率创建特殊烟花
+                                        createSpecialFirework();
+                                    } else {
+                                        createRandomFirework();
+                                    }
                                 } else {
-                                    createRandomFirework();
+                                    if (Math.random() > 0.6) {
+                                        createSpecialFirework();
+                                    } else {
+                                        createRandomFirework();
+                                    }
                                 }
-                            }, i * 120); // 从160减少到120
+                            }, i * (isMobile ? 150 : 120));
                         }
                         lastFireworkTime = now;
                     }
-                }, 900); // 从1100减少到900
+                }, isMobile ? 1100 : 900);
             }
             
             // 使用requestAnimationFrame的动画循环
@@ -2051,17 +2090,19 @@
                     }
                 }
                 
-                // 修改：增加粒子上限以适应更多爆炸
-                if (particles.length > 2200) { // 从1800增加到2200
-                    particles.splice(0, particles.length - 1900); // 从1600增加到1900
+                // 移动端减少粒子上限
+                const maxParticles = isMobile ? 1500 : 2200;
+                const keepParticles = isMobile ? 1300 : 1900;
+                if (particles.length > maxParticles) {
+                    particles.splice(0, particles.length - keepParticles);
                 }
                 
-                if (fireworks.length > 12) { // 从10增加到12
-                    fireworks.splice(0, fireworks.length - 10);
+                if (fireworks.length > (isMobile ? 8 : 12)) {
+                    fireworks.splice(0, fireworks.length - (isMobile ? 6 : 10));
                 }
                 
-                if (heartExplosions.length > 4) {
-                    heartExplosions.splice(0, heartExplosions.length - 3);
+                if (heartExplosions.length > (isMobile ? 3 : 4)) {
+                    heartExplosions.splice(0, heartExplosions.length - (isMobile ? 2 : 3));
                 }
                 
                 animationId = requestAnimationFrame(animate);
