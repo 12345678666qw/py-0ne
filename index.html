@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>新年快乐！</title>
+    <title>转盘抽奖</title>
     <style>
         * {
             margin: 0;
@@ -12,2161 +12,488 @@
         }
         
         body {
-            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #121212;
+            font-family: 'Microsoft YaHei', sans-serif;
             overflow: hidden;
-            font-family: "Microsoft YaHei", "PingFang SC", "Heiti SC", sans-serif;
-            color: white;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            user-select: none;
         }
         
-        /* 姓名输入页面样式 */
-        #nameInputPage {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 100;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            transition: opacity 0.8s ease;
-            transform: translateZ(0);
-            backface-visibility: hidden;
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
         }
         
-        .name-container {
-            text-align: center;
-            padding: 40px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 20px;
-            border: 2px solid #ffdd00;
-            box-shadow: 0 0 40px rgba(255, 221, 0, 0.5);
-            max-width: 90%;
-            width: 500px;
-            backdrop-filter: blur(10px);
-            transform: translateZ(0);
-            will-change: transform, opacity;
-        }
-        
-        .name-title {
-            font-size: 3.5rem;
-            font-weight: 900;
-            color: #ffdd00;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(255, 221, 0, 0.8);
-        }
-        
-        .name-subtitle {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: #fff;
-            opacity: 0.9;
-        }
-        
-        .name-input {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #ffdd00;
-            border-radius: 10px;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 25px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        
-        .name-input:focus {
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 0 20px rgba(255, 221, 0, 0.5);
-        }
-        
-        .name-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .name-submit {
-            padding: 15px 40px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            background: linear-gradient(135deg, #ffdd00 0%, #ff9900 100%);
-            border: none;
-            border-radius: 10px;
-            color: #000;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(255, 221, 0, 0.5);
-        }
-        
-        .name-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 30px rgba(255, 221, 0, 0.8);
-        }
-        
-        .name-submit:active {
-            transform: translateY(0);
-        }
-        
-        .name-hint {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        /* 烟花页面样式 */
-        #fireworksPage {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            transform: translateZ(0);
-        }
-        
-        #fireworksCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-crisp-edges;
-            image-rendering: pixelated;
-            image-rendering: crisp-edges;
-            transform: translateZ(0);
-            will-change: transform;
-        }
-        
-        .text-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 2;
-            pointer-events: none;
-            transform: translateZ(0);
-            will-change: transform, opacity;
-        }
-        
-        .final-text {
-            font-size: 10vw;
-            font-weight: 900;
-            color: #ffdd00;
-            text-shadow: 0 0 5px #ff9900;
-            text-align: center;
-            line-height: 1.2;
-            padding: 0;
-            margin: 0;
+        canvas {
             display: block;
-            transition: opacity 1s ease;
+            margin: 0 auto;
+            border-radius: 50%;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            background: #000;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-top: 50px solid #FF0000;
+            z-index: 10;
+            filter: drop-shadow(0 5px 10px rgba(255, 0, 0, 0.5));
+        }
+        
+        .pointer::after {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            width: 30px;
+            height: 30px;
+            background: #FF0000;
+            border-radius: 50%;
+        }
+        
+        .spin-btn {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            max-width: 95%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            border: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 5;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.8);
+            transition: all 0.3s;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        .spin-btn:hover:not(:disabled) {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 0 40px rgba(255, 107, 107, 1);
+        }
+        
+        .spin-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        #result {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
             opacity: 0;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            letter-spacing: 1px;
-            word-wrap: break-word;
-            word-break: break-all;
-            transform: translateZ(0);
-            backface-visibility: hidden;
+            transition: opacity 0.5s, transform 0.5s;
+            transform: translateX(-50%) translateY(50px);
         }
         
-        @media (max-width: 768px) {
-            .name-container {
-                padding: 30px 20px;
-                width: 90%;
+        #result.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        @media (max-width: 500px) {
+            .wheel-container {
+                width: 300px;
+                height: 300px;
             }
             
-            .name-title {
-                font-size: 2.5rem;
+            #result {
+                font-size: 22px;
+                padding: 20px;
             }
             
-            .name-input {
-                font-size: 1.2rem;
-                padding: 12px 15px;
-            }
-            
-            .name-submit {
-                padding: 12px 30px;
-                font-size: 1.1rem;
-            }
-            
-            .final-text {
-                font-size: 12vw;
-                white-space: normal;
-                max-width: 95%;
-                line-height: 1.1;
-                letter-spacing: 0.5px;
-                text-shadow: 0 0 3px #ff9900;
+            .spin-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 18px;
             }
         }
         
-        @media (max-height: 500px) {
-            .text-container {
-                align-items: flex-start;
-                padding-top: 10vh;
-            }
-            .final-text {
-                font-size: 10vh;
-                text-shadow: 0 0 4px #ff9900;
-            }
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
         
-        @media (max-width: 480px) {
-            .final-text {
-                font-size: 14vw;
-                white-space: normal;
-                max-width: 98%;
-                text-shadow: 0 0 2px #ff9900;
-            }
-        }
-        
-        @media (min-width: 2000px) {
-            .final-text {
-                font-size: 8vw;
-                text-shadow: 0 0 6px #ff9900;
-            }
-        }
-        
-        @media (max-width: 1024px) and (min-width: 769px) {
-            .final-text {
-                font-size: 9vw;
-                text-shadow: 0 0 4px #ff9900;
-            }
+        .sparkle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px white;
+            animation: sparkle 2s infinite;
         }
     </style>
 </head>
 <body>
-    <!-- 姓名输入页面 -->
-    <div id="nameInputPage">
-        <div class="name-container">
-            <div class="name-title">新年快乐！</div>
-            <div class="name-subtitle">请输入您的名字，开始烟花秀</div>
-            <input type="text" id="userName" class="name-input" placeholder="请输入您的名字" maxlength="20" autocomplete="off">
-            <button id="submitName" class="name-submit">开始烟花秀</button>
-            <div class="name-hint">点击按钮或按回车键开始</div>
-        </div>
+    <div class="wheel-container">
+        <canvas id="wheelCanvas" width="400" height="400"></canvas>
+        <div class="pointer"></div>
+        <button class="spin-btn" id="spinBtn">GO</button>
     </div>
     
-    <!-- 烟花页面 -->
-    <div id="fireworksPage">
-        <canvas id="fireworksCanvas"></canvas>
-        <div class="text-container">
-            <div class="final-text" id="finalText"></div>
-        </div>
-        
-        <!-- 背景音乐 -->
-        <audio id="bgMusic" loop preload="auto">
-            <source src="http://music.163.com/song/media/outer/url?id=1413464902.mp3" type="audio/mpeg">
-            您的浏览器不支持音频元素
-        </audio>
+    <div id="result"></div>
+    
+    <div class="controls">
+        <button class="control-btn" id="stopBtn" disabled>⏹️</button>
+        <button class="control-btn" id="resetBtn">🔄</button>
     </div>
 
     <script>
-        // 性能优化：减少全局变量查找
-        const nameInputPage = document.getElementById('nameInputPage');
-        const fireworksPage = document.getElementById('fireworksPage');
-        const userNameInput = document.getElementById('userName');
-        const submitNameBtn = document.getElementById('submitName');
-        const finalText = document.getElementById('finalText');
-        
-        // 检测是否为移动端
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-        const particleMultiplier = isMobile ? 0.6 : 1; // 移动端粒子数量减少40%
-        
-        // 性能优化：缓存DOM操作
-        const setOpacity = (element, value) => element.style.opacity = value;
-        const setDisplay = (element, value) => element.style.display = value;
-        
-        userNameInput.focus();
-        
-        // 性能优化：使用函数缓存
-        const formatGreetingText = (function() {
-            const charCodeCache = {};
-            
-            return function(userName) {
-                if (!userName || userName.trim() === '') {
-                    return '朋友，新年快乐！';
-                }
+        class SimpleLotteryWheel {
+            constructor() {
+                this.canvas = document.getElementById('wheelCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.spinBtn = document.getElementById('spinBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.resultEl = document.getElementById('result');
                 
-                let nameLength = 0;
-                const name = userName.trim();
+                // 转盘配置
+                this.centerX = this.canvas.width / 2;
+                this.centerY = this.canvas.height / 2;
+                this.radius = Math.min(this.centerX, this.centerY) - 20;
                 
-                for (let i = 0; i < name.length; i++) {
-                    const charCode = name.charCodeAt(i);
-                    
-                    // 使用缓存优化中文字符判断
-                    if (charCodeCache[charCode] === undefined) {
-                        charCodeCache[charCode] = (charCode >= 0x4E00 && charCode <= 0x9FFF) ? 2 : 1;
-                    }
-                    
-                    nameLength += charCodeCache[charCode];
-                }
-                
-                if (nameLength > 6) {
-                    return name + '，<br>新年快乐！';
-                } else {
-                    return name + '，新年快乐！';
-                }
-            };
-        })();
-        
-        // 文字居中优化函数
-        function optimizeTextCentering(textElement) {
-            if (!textElement) return;
-            
-            const text = textElement.innerHTML;
-            const lineCount = (text.match(/<br\s*\/?>/gi) || []).length + 1;
-            
-            // 如果是多行文字，调整行高和字体大小
-            if (lineCount > 1) {
-                textElement.style.lineHeight = '1.1';
-                
-                // 根据行数调整字体大小
-                if (lineCount > 2) {
-                    textElement.style.fontSize = '8vw';
-                }
-            }
-            
-            // 确保文字完全居中
-            textElement.style.display = 'flex';
-            textElement.style.flexDirection = 'column';
-            textElement.style.justifyContent = 'center';
-            textElement.style.alignItems = 'center';
-            textElement.style.textAlign = 'center';
-            
-            // 重新计算位置
-            setTimeout(() => {
-                textElement.style.transform = 'translate(-50%, -50%)';
-            }, 10);
-        }
-        
-        function submitName() {
-            const userName = userNameInput.value.trim();
-            const greetingHTML = formatGreetingText(userName);
-            finalText.innerHTML = greetingHTML;
-            setOpacity(finalText, '1');
-            
-            // 应用文字居中优化
-            optimizeTextCentering(finalText);
-            
-            setOpacity(nameInputPage, '0');
-            
-            setTimeout(() => {
-                setDisplay(nameInputPage, 'none');
-                setDisplay(fireworksPage, 'block');
-                initFireworks();
-            }, 800);
-        }
-        
-        submitNameBtn.addEventListener('click', submitName);
-        userNameInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitName();
-            }
-        });
-        
-        // 烟花系统 - 移动端优化版（减少粒子数量）
-        function initFireworks() {
-            const canvas = document.getElementById('fireworksCanvas');
-            const ctx = canvas.getContext('2d', { alpha: true });
-            const bgMusic = document.getElementById('bgMusic');
-            
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-            }
-            
-            resizeCanvas();
-            
-            // 性能优化：防抖处理resize事件
-            let resizeTimeout;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(resizeCanvas, 100);
-            });
-            
-            let fireworks = [];
-            let particles = [];
-            let heartExplosions = [];
-            let autoFireInterval;
-            let isAutoFiring = false;
-            let lastFireworkTime = 0;
-            
-            // 使用requestAnimationFrame自动适配帧率
-            let lastTime = 0;
-            let animationId = null;
-            
-            // 物理参数 - 高度真实感调优
-            const GRAVITY = 0.15; // 重力系数0.15 - 真实感最佳
-            const EXPLOSION_HEIGHT_RATIO = 0.55;
-            const WIND = 0.018; // 轻微风力
-            const AIR_RESISTANCE = 0.97; // 空气阻力系数0.97 - 控制粒子扩散范围
-            
-            // 颜色预设
-            const COLOR_PRESETS = [
-                // 主色调
-                {hue: 0, saturation: 100, lightness: 75, type: 'single'},     // 红色
-                {hue: 30, saturation: 100, lightness: 75, type: 'single'},    // 橙色
-                {hue: 60, saturation: 100, lightness: 75, type: 'single'},    // 黄色
-                {hue: 120, saturation: 100, lightness: 75, type: 'single'},   // 绿色
-                {hue: 180, saturation: 100, lightness: 75, type: 'single'},   // 青色
-                {hue: 240, saturation: 100, lightness: 75, type: 'single'},   // 蓝色
-                {hue: 270, saturation: 100, lightness: 75, type: 'single'},   // 紫色
-                {hue: 300, saturation: 100, lightness: 75, type: 'single'},   // 粉紫
-                {hue: 330, saturation: 100, lightness: 75, type: 'single'},   // 粉红
-                
-                // 渐变色调
-                {hue: 15, saturation: 100, lightness: 70, type: 'gradient'},  // 红橙渐变
-                {hue: 180, saturation: 100, lightness: 65, type: 'gradient'}, // 青蓝渐变
-                {hue: 280, saturation: 100, lightness: 70, type: 'gradient'}, // 紫粉渐变
-                {hue: 90, saturation: 100, lightness: 65, type: 'gradient'},  // 黄绿渐变
-                
-                // 彩菊型专用颜色
-                {hue: 0, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 30, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 60, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 90, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 120, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 150, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 180, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 210, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 240, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 270, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 300, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-                {hue: 330, saturation: 100, lightness: 70, type: 'chrysanthemum'},
-            ];
-            
-            // 爆炸模式分类 - 移除月亮型
-            const EXPLOSION_PATTERNS = {
-                // 普通烟花模式
-                CIRCLE: 'circle',
-                SPARKLE: 'sparkle',
-                VORTEX: 'vortex',
-                RAINBOW: 'rainbow',
-                RING: 'ring',
-                SUN: 'sun',
-                BURST: 'burst',
-                CASCADE: 'cascade',
-                
-                // 特殊烟花模式
-                HEART: 'heart',
-                METEOR_SHOWER: 'meteor_shower',
-                FIRE_TREE: 'fire_tree',
-                ELLIPSE: 'ellipse',
-                CHRYSANTHEMUM: 'chrysanthemum',
-                
-                // 参数方程模式
-                PARAMETRIC_CIRCLE: 'parametric_circle',
-                PARAMETRIC_ELLIPSE: 'parametric_ellipse',
-                PARAMETRIC_STAR: 'parametric_star',
-                SPIRAL_PARAMETRIC: 'spiral_parametric'
-            };
-            
-            // 简化随机函数
-            const random = (min, max) => Math.random() * (max - min) + min;
-            const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-            
-            // 随机爆炸模式选择 - 修改后频率分布
-            function getRandomExplosionPattern() {
-                const weightedPatterns = [];
-                
-                // 总样本数：225
-                
-                // 普通烟花模式：20% (45个样本)
-                const normalPatterns = [
-                    EXPLOSION_PATTERNS.CIRCLE,
-                    EXPLOSION_PATTERNS.SPARKLE,
-                    EXPLOSION_PATTERNS.VORTEX,
-                    EXPLOSION_PATTERNS.RAINBOW,
-                    EXPLOSION_PATTERNS.RING,
-                    EXPLOSION_PATTERNS.SUN,
-                    EXPLOSION_PATTERNS.BURST,
-                    EXPLOSION_PATTERNS.CASCADE
+                // 定义七个奖项 - 调整顺序，让"再来一次"在索引0，"神秘礼包"在索引1
+                this.prizes = [
+                    { name: '神秘礼包', color: '#FF9800', weight: 0 }, // 索引0
+                    { name: '再来一次', color: '#FF5252', weight: 100 }, // 索引1
+                    { name: '谢谢参与', color: '#FFEB3B', weight: 0 },
+                    { name: '奶茶一杯', color: '#4CAF50', weight: 0 },
+                    { name: '考试必过', color: '#2196F3', weight: 0 },
+                    { name: '幸运+999', color: '#9C27B0', weight: 0 },
+                    { name: '爱心奶茶', color: '#E91E63', weight: 0 }
                 ];
                 
-                // 分配45个样本：前6种模式各6个样本，后2种各5个样本
-                const counts = [6, 6, 6, 6, 6, 5, 5, 5];
+                // 动画相关
+                this.prizeCount = this.prizes.length;
+                this.angleStep = (2 * Math.PI) / this.prizeCount; // 每个扇形的弧度
                 
-                for (let i = 0; i < normalPatterns.length; i++) {
-                    for (let j = 0; j < counts[i]; j++) {
-                        weightedPatterns.push(normalPatterns[i]);
-                    }
-                }
+                // 计算起始角度：让"再来一次"（索引0）的中心点对准指针
+                // 由于Canvas的0弧度在3点钟方向，而指针在12点钟方向，需要减去π/2进行校正
+                const startPrizeIndex = 0;
+                this.startAngle = (startPrizeIndex * this.angleStep + this.angleStep / 2) - Math.PI / 2;
                 
-                // 参数方程模式：40% (90个样本) - 修改：提高标准圆型至24%
-                // 标准圆型：24% (54个样本) - 从15%提高
-                for (let i = 0; i < 54; i++) weightedPatterns.push(EXPLOSION_PATTERNS.PARAMETRIC_CIRCLE);
-                // 椭圆型：8% (18个样本) - 从10%降低
-                for (let i = 0; i < 18; i++) weightedPatterns.push(EXPLOSION_PATTERNS.PARAMETRIC_ELLIPSE);
-                // 星型：6% (14个样本) - 保持不变
-                for (let i = 0; i < 14; i++) weightedPatterns.push(EXPLOSION_PATTERNS.PARAMETRIC_STAR);
-                // 螺旋型（参数方程）：2% (4个样本) - 从6%降低，为其他模式腾出空间
-                for (let i = 0; i < 4; i++) weightedPatterns.push(EXPLOSION_PATTERNS.SPIRAL_PARAMETRIC);
+                // 计算目标角度：让"神秘礼包"（索引1）的中心点对准指针
+                const targetPrizeIndex = 1;
+                this.targetAngle = (targetPrizeIndex * this.angleStep + this.angleStep / 2) - Math.PI / 2;
                 
-                // 特殊烟花模式：40% (90个样本) - 修改：降低火树银花和流星雨概率
-                // 心形：12% (27个样本) - 增加
-                for (let i = 0; i < 27; i++) weightedPatterns.push(EXPLOSION_PATTERNS.HEART);
-                // 流星雨：8% (18个样本) - 从10%降低
-                for (let i = 0; i < 18; i++) weightedPatterns.push(EXPLOSION_PATTERNS.METEOR_SHOWER);
-                // 火树银花：5% (11个样本) - 从8%降低
-                for (let i = 0; i < 11; i++) weightedPatterns.push(EXPLOSION_PATTERNS.FIRE_TREE);
-                // 椭圆型（旧）：3% (7个样本) - 保持不变
-                for (let i = 0; i < 7; i++) weightedPatterns.push(EXPLOSION_PATTERNS.ELLIPSE);
-                // 彩菊型：12% (27个样本) - 增加
-                for (let i = 0; i < 27; i++) weightedPatterns.push(EXPLOSION_PATTERNS.CHRYSANTHEMUM);
+                // 计算从起始位置到目标位置需要旋转的角度
+                // 由于我们使用的是逆时针旋转（因为Canvas坐标系中正角度是逆时针）
+                // 所以从"再来一次"（索引0）到"神秘礼包"（索引1）是顺时针旋转一个扇区
+                // 对于逆时针旋转系统，这相当于逆时针旋转(总扇形数-1)个扇区
+                const clockwiseDistance = (targetPrizeIndex - startPrizeIndex + this.prizeCount) % this.prizeCount;
+                this.sectorDistance = clockwiseDistance; // 顺时针方向的扇区数
                 
-                return weightedPatterns[randomInt(0, weightedPatterns.length - 1)];
+                this.rotation = this.startAngle;
+                this.spinSpeed = 0;
+                this.isSpinning = false;
+                this.targetPrizeIndex = 1; // 永远停在神秘礼包（索引1）
+                this.animationId = null;
+                this.spinStartTime = 0;
+                this.spinDuration = 4000;
+                
+                this.init();
+                this.drawWheel();
+                this.createSparkles();
             }
             
-            // 获取随机颜色配置 - 移除月亮型颜色配置
-            function getRandomColorConfig(pattern) {
-                if (pattern === EXPLOSION_PATTERNS.CHRYSANTHEMUM) {
-                    const chrysanthemumColors = COLOR_PRESETS.filter(c => c.type === 'chrysanthemum');
-                    return chrysanthemumColors[randomInt(0, chrysanthemumColors.length - 1)];
-                }
+            init() {
+                this.spinBtn.addEventListener('click', () => this.startSpin());
+                this.stopBtn.addEventListener('click', () => this.stopSpin());
+                this.resetBtn.addEventListener('click', () => this.reset());
                 
-                const color1 = COLOR_PRESETS[randomInt(0, COLOR_PRESETS.length - 1)];
-                
-                if (Math.random() < 0.3) {
-                    const color2 = COLOR_PRESETS[randomInt(0, COLOR_PRESETS.length - 1)];
-                    return {
-                        hue: color1.hue,
-                        saturation: color1.saturation,
-                        lightness: color1.lightness,
-                        type: 'dual',
-                        secondHue: color2.hue,
-                        secondSaturation: color2.saturation,
-                        secondLightness: color2.lightness
-                    };
-                }
-                
-                return color1;
+                // 键盘快捷键
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        if (!this.isSpinning) this.startSpin();
+                        e.preventDefault();
+                    }
+                    if (e.key === 's' || e.key === 'S') {
+                        if (this.isSpinning) this.stopSpin();
+                    }
+                    if (e.key === 'r' || e.key === 'R') {
+                        this.reset();
+                    }
+                });
             }
             
-            // 简化爱心爆炸管理器
-            class HeartExplosionManager {
-                constructor(x, y, colorConfig, explosionPower) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    this.explosionPower = explosionPower;
-                    
-                    this.createdAt = Date.now();
-                    this.lifetime = 1500; // 直接显示1500毫秒后消失
-                    this.heartParticles = [];
-                    
-                    this.createHeartParticles();
-                }
+            drawWheel() {
+                const ctx = this.ctx;
+                const centerX = this.centerX;
+                const centerY = this.centerY;
+                const radius = this.radius;
+                const prizeCount = this.prizeCount;
+                const angleStep = this.angleStep;
                 
-                createHeartParticles() {
-                    // 移动端减少粒子数量
-                    const baseCount = isMobile ? randomInt(70, 110) : randomInt(120, 180);
-                    const particleCount = Math.floor(baseCount * particleMultiplier);
-                    
-                    for (let i = 0; i < particleCount; i++) {
-                        const t = (i / particleCount) * Math.PI * 2;
-                        
-                        // 心形参数方程 - 简化版
-                        const sinT = Math.sin(t);
-                        const cosT = Math.cos(t);
-                        const cos2T = Math.cos(2 * t);
-                        const cos3T = Math.cos(3 * t);
-                        const cos4T = Math.cos(4 * t);
-                        
-                        const heartX = 16 * Math.pow(sinT, 3);
-                        const heartY = 13 * cosT - 5 * cos2T - 2 * cos3T - cos4T;
-                        
-                        const scale = 5.5 * this.explosionPower;
-                        const x = this.x + heartX * scale;
-                        const y = this.y - heartY * scale;
-                        
-                        const heartParticle = new SimplifiedHeartParticle(
-                            x, y, 
-                            this.colorConfig,
-                            this.explosionPower,
-                            t
-                        );
-                        
-                        this.heartParticles.push(heartParticle);
-                    }
-                }
+                // 清空画布
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    const currentTime = Date.now();
-                    const elapsed = currentTime - this.createdAt;
-                    
-                    // 更新粒子，简化处理
-                    for (let i = this.heartParticles.length - 1; i >= 0; i--) {
-                        this.heartParticles[i].update(deltaTime, elapsed);
-                    }
-                    
-                    // 简单的生命周期判断
-                    return elapsed < this.lifetime;
-                }
+                // 绘制转盘背景
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius + 5, 0, 2 * Math.PI);
+                ctx.fillStyle = '#000';
+                ctx.fill();
                 
-                draw(ctx) {
-                    for (const heartParticle of this.heartParticles) {
-                        heartParticle.draw(ctx);
-                    }
-                }
-            }
-            
-            // 简化爱心粒子类
-            class SimplifiedHeartParticle {
-                constructor(x, y, colorConfig, explosionPower, phase) {
-                    this.x = x;
-                    this.y = y;
-                    this.originalX = x;
-                    this.originalY = y;
-                    this.colorConfig = colorConfig;
-                    this.explosionPower = explosionPower;
-                    this.phase = phase;
-                    
-                    // 简化粒子属性
-                    this.baseSize = random(1.5, 2.5);
-                    this.currentSize = this.baseSize;
-                    this.life = 1.0;
-                    
-                    // 参数方程参数
-                    this.t = phase;
-                    this.scale = 5.5 * this.explosionPower;
-                    
-                    // 计算初始位置
-                    this.updatePositionFromParametric();
-                    
-                    // 颜色属性简化
-                    this.hue = colorConfig.hue;
-                    this.saturation = colorConfig.saturation;
-                    this.lightness = colorConfig.lightness;
-                    
-                    // 简单的闪烁效果
-                    this.twinkleSpeed = random(0.8, 1.5);
-                    this.twinklePhase = random(0, Math.PI * 2);
-                    this.twinkleAmount = random(0.1, 0.2);
-                }
+                // 保存状态并旋转画布
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(this.rotation);
                 
-                updatePositionFromParametric() {
-                    // 心形参数方程
-                    const sinT = Math.sin(this.t);
-                    const cosT = Math.cos(this.t);
-                    const cos2T = Math.cos(2 * this.t);
-                    const cos3T = Math.cos(3 * this.t);
-                    const cos4T = Math.cos(4 * this.t);
+                // 绘制扇形
+                for (let i = 0; i < prizeCount; i++) {
+                    const startAngle = i * angleStep;
+                    const endAngle = (i + 1) * angleStep;
                     
-                    const heartX = 16 * Math.pow(sinT, 3);
-                    const heartY = 13 * cosT - 5 * cos2T - 2 * cos3T - cos4T;
-                    
-                    this.x = this.originalX + heartX * this.scale;
-                    this.y = this.originalY - heartY * this.scale;
-                }
-                
-                update(deltaTime, elapsed) {
-                    const deltaSeconds = deltaTime / 1000;
-                    
-                    // 简单的生命周期衰减
-                    this.life = Math.max(0, 1 - elapsed / 1500);
-                    
-                    // 轻微的位置波动
-                    if (Math.random() < 0.3) {
-                        this.x += random(-0.8, 0.8);
-                        this.y += random(-0.8, 0.8);
-                    }
-                    
-                    // 简化闪烁效果
-                    const twinkle = Math.sin(Date.now() * 0.001 * this.twinkleSpeed + this.twinklePhase) * this.twinkleAmount;
-                    this.currentSize = this.baseSize * (1 + twinkle) * this.life;
-                    
-                    return this.life > 0;
-                }
-                
-                draw(ctx) {
-                    const alpha = this.life * 0.9;
-                    
-                    // 简化颜色计算
-                    let hue, saturation, lightness;
-                    
-                    if (this.colorConfig.type === 'dual' && Math.random() > 0.5) {
-                        hue = this.colorConfig.secondHue || this.colorConfig.hue;
-                        saturation = this.colorConfig.secondSaturation || this.colorConfig.saturation;
-                        lightness = this.colorConfig.secondLightness || this.colorConfig.lightness;
-                    } else {
-                        hue = this.hue;
-                        saturation = this.saturation;
-                        lightness = this.lightness;
-                    }
-                    
-                    const color = `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
-                    
-                    ctx.fillStyle = color;
+                    // 绘制扇形
                     ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-            
-            // 流星类
-            class Meteor {
-                constructor(x, y, colorConfig) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    
-                    this.size = random(1.8, 3.7);
-                    this.length = random(18, 36);
-                    this.speed = random(280, 550);
-                    this.angle = random(-Math.PI/8, Math.PI/8);
-                    this.life = 1.0;
-                    this.decayRate = random(0.085, 0.22);
-                    
-                    this.vx = Math.sin(this.angle) * this.speed;
-                    this.vy = Math.cos(this.angle) * this.speed;
-                    
-                    this.createdAt = Date.now();
-                    
-                    this.trailParticles = [];
-                    this.lastTrailTime = 0;
-                    this.fadeFactor = 1.5;
-                }
-                
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    const currentTime = Date.now();
-                    
-                    this.x += this.vx * deltaSeconds;
-                    this.y += this.vy * deltaSeconds;
-                    
-                    this.vy += GRAVITY * 0.75 * deltaSeconds;
-                    this.vx += WIND * random(-0.04, 0.04) * deltaSeconds;
-                    
-                    this.vx *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    this.vy *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    if (currentTime - this.lastTrailTime > 22) {
-                        this.trailParticles.push(new MeteorTrailParticle(
-                            this.x,
-                            this.y,
-                            this.colorConfig
-                        ));
-                        this.lastTrailTime = currentTime;
-                    }
-                    
-                    for (let i = this.trailParticles.length - 1; i >= 0; i--) {
-                        if (!this.trailParticles[i].update(deltaTime)) {
-                            this.trailParticles.splice(i, 1);
-                        }
-                    }
-                    
-                    if (this.trailParticles.length > (isMobile ? 15 : 25)) {
-                        this.trailParticles.splice(0, this.trailParticles.length - (isMobile ? 12 : 20));
-                    }
-                    
-                    return this.life > 0 && this.y < canvas.height + 45;
-                }
-                
-                draw(ctx) {
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor) * 0.85;
-                    const color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${this.colorConfig.lightness}%, ${alpha})`;
-                    
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.moveTo(0, 0);
+                    ctx.arc(0, 0, radius, startAngle, endAngle);
+                    ctx.closePath();
+                    ctx.fillStyle = this.prizes[i].color;
                     ctx.fill();
                     
-                    const gradient = ctx.createLinearGradient(
-                        this.x, this.y,
-                        this.x - Math.sin(this.angle) * this.length,
-                        this.y - Math.cos(this.angle) * this.length
-                    );
-                    
-                    gradient.addColorStop(0, `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${this.colorConfig.lightness}%, ${alpha})`);
-                    gradient.addColorStop(0.5, `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${this.colorConfig.lightness}%, ${alpha * 0.45})`);
-                    gradient.addColorStop(1, `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${this.colorConfig.lightness}%, 0)`);
-                    
-                    ctx.strokeStyle = gradient;
-                    ctx.lineWidth = this.size * 0.75;
-                    ctx.lineCap = 'round';
-                    ctx.beginPath();
-                    ctx.moveTo(this.x, this.y);
-                    ctx.lineTo(
-                        this.x - Math.sin(this.angle) * this.length,
-                        this.y - Math.cos(this.angle) * this.length
-                    );
+                    // 绘制扇形边框
+                    ctx.strokeStyle = 'white';
+                    ctx.lineWidth = 2;
                     ctx.stroke();
                     
-                    for (const trailParticle of this.trailParticles) {
-                        trailParticle.draw(ctx);
-                    }
+                    // 保存状态以绘制文字
+                    ctx.save();
+                    
+                    // 计算扇形的中心角度
+                    const midAngle = startAngle + angleStep / 2;
+                    
+                    // 旋转到扇形的中心角度
+                    ctx.rotate(midAngle);
+                    
+                    // 移动到扇形中的位置（从圆心向外移动）
+                    const textRadius = radius * 0.6; // 文字位置（半径的60%处）
+                    
+                    // 绘制文字 - 确保文字在扇形中居中
+                    const prizeName = this.prizes[i].name;
+                    
+                    // 根据文字长度调整字体大小
+                    let fontSize = 18;
+                    if (prizeName.length >= 4) fontSize = 16;
+                    if (prizeName.length >= 5) fontSize = 14;
+                    
+                    ctx.font = `bold ${fontSize}px Microsoft YaHei`;
+                    ctx.fillStyle = this.getContrastColor(this.prizes[i].color);
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    // 绘制文字 - 注意：这里文字方向是沿着半径方向
+                    ctx.fillText(prizeName, textRadius, 0);
+                    
+                    // 恢复状态
+                    ctx.restore();
                 }
+                
+                // 绘制中心圆
+                ctx.beginPath();
+                ctx.arc(0, 0, 30, 0, 2 * Math.PI);
+                ctx.fillStyle = 'white';
+                ctx.fill();
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 5;
+                ctx.stroke();
+                
+                // 绘制中心文字
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 20px Microsoft YaHei';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('GO', 0, 0);
+                
+                ctx.restore();
             }
             
-            // 流星轨迹粒子类
-            class MeteorTrailParticle {
-                constructor(x, y, colorConfig) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    
-                    this.size = random(0.9, 2.3);
-                    this.life = 1.0;
-                    this.decayRate = random(0.055, 0.18);
-                    
-                    this.vx = random(-8, 8);
-                    this.vy = random(-8, 8);
-                    
-                    this.fadeFactor = 1.5;
-                }
+            getContrastColor(hexColor) {
+                if (!hexColor || hexColor.length < 7) return '#000';
                 
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    
-                    this.x += this.vx * deltaSeconds;
-                    this.y += this.vy * deltaSeconds;
-                    
-                    this.vy += GRAVITY * 0.25 * deltaSeconds;
-                    
-                    this.vx *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    this.vy *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    return this.life > 0;
-                }
-                
-                draw(ctx) {
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor) * 0.55;
-                    const color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${this.colorConfig.lightness}%, ${alpha})`;
-                    
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+                const r = parseInt(hexColor.substr(1, 2), 16);
+                const g = parseInt(hexColor.substr(3, 2), 16);
+                const b = parseInt(hexColor.substr(5, 2), 16);
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                return brightness > 128 ? '#000' : '#FFF';
             }
             
-            // 火树银花粒子类
-            class FireTreeParticle {
-                constructor(x, y, colorConfig) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    
-                    this.baseSize = random(1.6, 3.2);
-                    this.currentSize = this.baseSize;
-                    this.life = 1.0;
-                    this.decayRate = random(0.01, 0.03);
-                    
-                    this.twinkleSpeed = random(1.1, 2.8);
-                    this.twinklePhase = random(0, Math.PI * 2);
-                    this.twinkleAmount = random(0.25, 0.55);
-                    
-                    this.phase = 1;
-                    this.phaseDuration = random(0.9, 2.0);
-                    this.phaseTime = 0;
-                    
-                    const angle = random(-Math.PI, Math.PI);
-                    const speed = random(110, 330);
-                    this.vx = Math.cos(angle) * speed * 0.65;
-                    this.vy = Math.sin(angle) * speed - 140;
-                    
-                    this.fallSpeed = random(25, 90);
-                    this.swingAmount = random(18, 55);
-                    this.swingSpeed = random(1.1, 3.2);
-                    this.swingPhase = random(0, Math.PI * 2);
-                    
-                    this.sparkParticles = [];
-                    this.lastSparkTime = 0;
-                    
-                    this.createdAt = Date.now();
-                    this.fadeFactor = 1.5;
-                }
-                
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    const currentTime = Date.now();
-                    this.phaseTime += deltaSeconds;
-                    
-                    if (this.phase === 1) {
-                        this.x += this.vx * deltaSeconds;
-                        this.y += this.vy * deltaSeconds;
-                        
-                        this.vy += GRAVITY * 0.18 * deltaSeconds;
-                        this.vx += WIND * random(-0.018, 0.018) * deltaSeconds;
-                        
-                        this.vx *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                        this.vy *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                        
-                        if (currentTime - this.lastSparkTime > 45) {
-                            this.sparkParticles.push(new FireTreeSpark(
-                                this.x + random(-2.5, 2.5),
-                                this.y + random(-2.5, 2.5),
-                                this.colorConfig
-                            ));
-                            this.lastSparkTime = currentTime;
-                        }
-                        
-                        if (this.phaseTime > this.phaseDuration) {
-                            this.phase = 2;
-                            this.vx = random(-18, 18);
-                            this.vy = this.fallSpeed;
-                        }
-                    } else {
-                        this.x += this.vx * deltaSeconds;
-                        this.y += this.vy * deltaSeconds;
-                        
-                        const swing = Math.sin(currentTime * 0.001 * this.swingSpeed + this.swingPhase) * this.swingAmount * deltaSeconds;
-                        this.x += swing;
-                        
-                        this.vy += GRAVITY * 0.65 * deltaSeconds;
-                        this.vx += WIND * random(-0.009, 0.009) * deltaSeconds;
-                        
-                        this.vx *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                        
-                        if (currentTime - this.lastSparkTime > 110) {
-                            this.sparkParticles.push(new FireTreeSpark(
-                                this.x + random(-1.8, 1.8),
-                                this.y + random(-1.8, 1.8),
-                                this.colorConfig
-                            ));
-                            this.lastSparkTime = currentTime;
-                        }
-                    }
-                    
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    const twinkle = Math.sin(currentTime * 0.001 * this.twinkleSpeed + this.twinklePhase) * this.twinkleAmount;
-                    this.currentSize = this.baseSize * (1 + twinkle) * this.life;
-                    
-                    for (let i = this.sparkParticles.length - 1; i >= 0; i--) {
-                        if (!this.sparkParticles[i].update(deltaTime)) {
-                            this.sparkParticles.splice(i, 1);
-                        }
-                    }
-                    
-                    if (this.sparkParticles.length > (isMobile ? 8 : 12)) {
-                        this.sparkParticles.splice(0, this.sparkParticles.length - (isMobile ? 6 : 10));
-                    }
-                    
-                    return this.life > 0 && this.y < canvas.height + 70;
-                }
-                
-                draw(ctx) {
-                    for (const spark of this.sparkParticles) {
-                        spark.draw(ctx);
-                    }
-                    
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor) * 0.85;
-                    let color;
-                    
-                    if (this.colorConfig.type === 'silver' || this.colorConfig.type === 'light_silver') {
-                        const brightness = 88 + Math.sin(Date.now() * 0.0018) * 8;
-                        color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${brightness}%, ${alpha})`;
-                    } else if (this.colorConfig.type === 'gold' || this.colorConfig.type === 'light_gold') {
-                        const brightness = 78 + Math.sin(Date.now() * 0.0025) * 12;
-                        color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${brightness}%, ${alpha})`;
-                    } else {
-                        const brightness = 93 + Math.sin(Date.now() * 0.0012) * 4;
-                        color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, ${brightness}%, ${alpha})`;
-                    }
-                    
-                    ctx.fillStyle = color;
-                    
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    if (this.life > 0.6) {
-                        ctx.globalAlpha = alpha * 0.35;
-                        ctx.fillStyle = this.colorConfig.type.includes('silver') 
-                            ? 'rgba(255, 255, 255, 0.25)'
-                            : this.colorConfig.type.includes('gold')
-                                ? 'rgba(255, 215, 0, 0.25)'
-                                : 'rgba(255, 255, 255, 0.25)';
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.currentSize * 1.4, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.globalAlpha = 1.0;
-                    }
-                }
+            selectPrizeByWeight() {
+                // 永远返回神秘礼包（索引1）
+                return 1;
             }
             
-            // 火树银花火花粒子类
-            class FireTreeSpark {
-                constructor(x, y, colorConfig) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    
-                    this.size = random(0.7, 1.9);
-                    this.life = 1.0;
-                    this.decayRate = random(0.18, 0.38);
-                    
-                    this.vx = random(-18, 18);
-                    this.vy = random(-18, 18);
-                    
-                    this.fadeFactor = 1.5;
-                }
+            startSpin() {
+                if (this.isSpinning) return;
                 
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    
-                    this.x += this.vx * deltaSeconds;
-                    this.y += this.vy * deltaSeconds;
-                    
-                    this.vy += GRAVITY * 0.4 * deltaSeconds;
-                    
-                    this.vx *= Math.pow(0.88, deltaSeconds * 60);
-                    this.vy *= Math.pow(0.88, deltaSeconds * 60);
-                    
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    return this.life > 0;
-                }
+                this.isSpinning = true;
+                this.spinBtn.disabled = true;
+                this.stopBtn.disabled = false;
                 
-                draw(ctx) {
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor) * 0.65;
-                    let color;
-                    
-                    if (this.colorConfig.type === 'silver' || this.colorConfig.type === 'light_silver') {
-                        color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, 92%, ${alpha})`;
-                    } else if (this.colorConfig.type === 'gold' || this.colorConfig.type === 'light_gold') {
-                        color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, 87%, ${alpha})`;
-                    } else {
-                        color = `hsla(${this.colorConfig.hue}, ${this.colorConfig.saturation}%, 92%, ${alpha})`;
-                    }
-                    
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+                // 隐藏结果框
+                this.resultEl.classList.remove('show');
+                
+                // 固定选择神秘礼包（索引1）
+                this.targetPrizeIndex = this.selectPrizeByWeight();
+                
+                // 重置到起始位置
+                this.rotation = this.startAngle;
+                
+                // 设置初始速度
+                const baseSpeed = 8 + Math.random() * 4;
+                this.spinSpeed = baseSpeed;
+                
+                this.spinStartTime = Date.now();
+                this.animate();
             }
             
-            // 彩菊型粒子类
-            class ChrysanthemumParticle {
-                constructor(x, y, colorConfig, explosionPower = 1) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    this.explosionPower = explosionPower;
-                    
-                    this.baseSize = random(1.1, 2.2);
-                    this.currentSize = this.baseSize;
-                    this.life = 1.0;
-                    this.decayRate = random(0.085, 0.22);
-                    
-                    this.hueShift = random(-18, 18);
-                    this.originalHue = colorConfig.hue;
-                    
-                    const angle = random(0, Math.PI * 2);
-                    const speed = random(165, 320) * explosionPower;
-                    this.vx = Math.cos(angle) * speed;
-                    this.vy = Math.sin(angle) * speed;
-                    
-                    this.curveFactor = random(0.25, 0.85);
-                    this.curveTime = 0;
-                    
-                    this.isFireSpark = true;
-                    this.fireSparkDuration = random(0.12, 0.28);
-                    this.colorMixRatio = 0;
-                    this.colorMixSpeed = random(0.55, 1.1);
-                    
-                    this.sparkleFactor = random(0.22, 0.42);
-                    this.sparklePhase = random(0, Math.PI * 2);
-                    
-                    this.createdAt = Date.now();
-                    
-                    this.tailParticles = [];
-                    this.fadeFactor = 1.5;
-                }
+            animate() {
+                const currentTime = Date.now();
+                const elapsed = currentTime - this.spinStartTime;
+                const progress = Math.min(elapsed / this.spinDuration, 1);
                 
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    this.curveTime += deltaSeconds;
-                    
-                    this.x += this.vx * deltaSeconds;
-                    this.y += this.vy * deltaSeconds;
-                    
-                    const curve = Math.sin(this.curveTime * 0.0025) * this.curveFactor;
-                    this.vx += curve * deltaSeconds * 35;
-                    this.vy += curve * deltaSeconds * 35;
-                    
-                    this.vy += GRAVITY * 0.55 * deltaSeconds;
-                    this.vx += WIND * random(-0.025, 0.025) * deltaSeconds;
-                    
-                    this.vx *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    this.vy *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    const aliveTime = (Date.now() - this.createdAt) / 1000;
-                    if (this.isFireSpark && aliveTime > this.fireSparkDuration) {
-                        this.isFireSpark = false;
-                    }
-                    
-                    if (!this.isFireSpark && this.colorMixRatio < 1) {
-                        this.colorMixRatio = Math.min(1, this.colorMixRatio + this.colorMixSpeed * deltaSeconds);
-                    }
-                    
-                    this.currentSize = this.baseSize * this.life;
-                    
-                    if (this.sparkleFactor > 0) {
-                        this.currentSize *= 1 + Math.sin(Date.now() * 0.007 + this.sparklePhase) * this.sparkleFactor;
-                    }
-                    
-                    if (Math.random() < (isMobile ? 0.12 : 0.18)) {
-                        this.tailParticles.push(new ChrysanthemumTailParticle(
-                            this.x,
-                            this.y,
-                            this.colorConfig,
-                            this.life
-                        ));
-                    }
-                    
-                    for (let i = this.tailParticles.length - 1; i >= 0; i--) {
-                        if (!this.tailParticles[i].update(deltaTime)) {
-                            this.tailParticles.splice(i, 1);
-                        }
-                    }
-                    
-                    if (this.tailParticles.length > (isMobile ? 6 : 8)) {
-                        this.tailParticles.splice(0, this.tailParticles.length - (isMobile ? 5 : 7));
-                    }
-                    
-                    return this.life > 0 && this.y < canvas.height + 75;
-                }
+                // 使用缓动函数
+                const easeOut = 1 - Math.pow(1 - progress, 3);
                 
-                draw(ctx) {
-                    for (const tailParticle of this.tailParticles) {
-                        tailParticle.draw(ctx);
-                    }
-                    
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor);
-                    
-                    let color;
-                    if (this.isFireSpark) {
-                        const brightness = 88 + Math.sin(Date.now() * 0.004) * 7;
-                        color = `hsla(60, 100%, ${brightness}%, ${alpha * 0.82})`;
-                    } else {
-                        const hue = (this.originalHue + this.hueShift * this.colorMixRatio) % 360;
-                        const saturation = this.colorConfig.saturation;
-                        const lightness = 68 + (this.colorConfig.lightness - 68) * this.colorMixRatio;
-                        
-                        color = `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha * 0.72})`;
-                    }
-                    
-                    ctx.fillStyle = color;
-                    
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    if (this.life > 0.5) {
-                        ctx.globalAlpha = this.life * 0.22;
-                        ctx.fillStyle = this.isFireSpark ? 'rgba(255, 255, 235, 0.35)' : `hsla(${this.colorConfig.hue}, 62%, 78%, 0.22)`;
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.currentSize * 1.12, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.globalAlpha = 1.0;
-                    }
-                }
-            }
-            
-            // 彩菊型尾部粒子类
-            class ChrysanthemumTailParticle {
-                constructor(x, y, colorConfig, parentLife) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    
-                    this.size = random(0.6, 1.6);
-                    this.life = parentLife * random(0.45, 0.75);
-                    this.decayRate = random(0.12, 0.28);
-                    
-                    this.vx = random(-12, 12);
-                    this.vy = random(-12, 12);
-                    
-                    this.fadeFactor = 1.5;
-                }
+                // 计算从起始位置到目标位置需要旋转的总角度
+                // 我们需要逆时针旋转，所以角度为负数
+                // 总旋转 = 额外圈数(逆时针) + 目标角度与起始角度的差值
+                const extraRotations = 5; // 额外的5圈
                 
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    
-                    this.x += this.vx * deltaSeconds;
-                    this.y += this.vy * deltaSeconds;
-                    
-                    this.vy += GRAVITY * 0.35 * deltaSeconds;
-                    
-                    this.vx *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    this.vy *= Math.pow(AIR_RESISTANCE, deltaSeconds * 60);
-                    
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    return this.life > 0;
-                }
+                // 计算顺时针方向从"再来一次"到"神秘礼包"的角度差
+                const clockwiseAngleDiff = this.sectorDistance * this.angleStep;
                 
-                draw(ctx) {
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor) * 0.48;
-                    const hue = this.colorConfig.hue;
-                    const saturation = this.colorConfig.saturation;
-                    const lightness = this.colorConfig.lightness;
-                    
-                    const color = `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
-                    
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-            
-            // 参数方程螺旋粒子类
-            class ParametricSpiralParticle {
-                constructor(x, y, colorConfig, explosionPower) {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    this.explosionPower = explosionPower;
-                    
-                    // 螺旋参数
-                    this.theta = random(0, Math.PI * 12);
-                    this.a = random(1.5, 3.0);
-                    this.angularSpeed = random(2.0, 4.0);
-                    this.radialSpeed = random(80, 150) * explosionPower;
-                    
-                    // 粒子属性
-                    this.baseSize = random(1.0, 2.2);
-                    this.currentSize = this.baseSize;
-                    this.life = 1.0;
-                    this.decayRate = random(0.12, 0.25);
-                    
-                    // 螺旋类型选择
-                    this.spiralType = randomInt(0, 2);
-                    
-                    // 颜色属性
-                    this.hueShift = random(-20, 20);
-                    this.originalHue = colorConfig.hue;
-                    
-                    // 动态效果
-                    this.twinkleSpeed = random(2.0, 3.5);
-                    this.twinklePhase = random(0, Math.PI * 2);
-                    this.twinkleAmount = random(0.15, 0.3);
-                    
-                    this.createdAt = Date.now();
-                    this.fadeFactor = 1.5;
-                }
+                // 转换为逆时针旋转的角度（Canvas坐标系）
+                // 逆时针旋转角度 = 2π - 顺时针角度
+                const counterClockwiseAngleDiff = (2 * Math.PI) - clockwiseAngleDiff;
                 
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    const currentTime = Date.now();
-                    
-                    // 更新角度
-                    this.theta += this.angularSpeed * deltaSeconds;
-                    
-                    // 根据螺旋类型计算位置
-                    let r;
-                    switch (this.spiralType) {
-                        case 0:  // 阿基米德螺旋线: r = aθ
-                            r = this.a * this.theta;
-                            break;
-                        case 1:  // 费马螺旋线: r² = a²θ
-                            r = this.a * Math.sqrt(Math.abs(this.theta));
-                            break;
-                        case 2:  // 双曲螺旋线: r = a/θ
-                            r = this.a / (Math.max(0.1, Math.abs(this.theta)));
-                            break;
-                        default:
-                            r = this.a * this.theta;
-                    }
-                    
-                    // 计算新位置
-                    const newX = this.x + Math.cos(this.theta) * r;
-                    const newY = this.y + Math.sin(this.theta) * r;
-                    
-                    // 计算速度
-                    this.vx = (newX - this.x) / deltaSeconds;
-                    this.vy = (newY - this.y) / deltaSeconds;
-                    
-                    this.x = newX;
-                    this.y = newY;
-                    
-                    // 添加重力效果
-                    this.vy += GRAVITY * 0.3 * deltaSeconds;
-                    
-                    // 生命周期衰减
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    // 闪烁效果
-                    const twinkle = Math.sin(currentTime * 0.001 * this.twinkleSpeed + this.twinklePhase) * this.twinkleAmount;
-                    this.currentSize = this.baseSize * (1 + twinkle) * this.life;
-                    
-                    // 随着半径增大，粒子逐渐变大
-                    const radiusFactor = Math.min(2.0, r / 100);
-                    this.currentSize *= (1 + radiusFactor * 0.3);
-                    
-                    return this.life > 0 && this.y < canvas.height + 90;
-                }
+                // 总旋转角度 = 额外的逆时针圈数 + 逆时针角度差
+                const totalRotation = extraRotations * (2 * Math.PI) + counterClockwiseAngleDiff;
                 
-                draw(ctx) {
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor) * 0.85;
-                    
-                    // 颜色根据角度变化
-                    const hue = (this.originalHue + this.hueShift + this.theta * 20) % 360;
-                    const saturation = this.colorConfig.saturation;
-                    const lightness = this.colorConfig.lightness + Math.sin(this.theta) * 5;
-                    
-                    const color = `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha})`;
-                    
-                    ctx.fillStyle = color;
-                    
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    if (this.life > 0.6) {
-                        ctx.globalAlpha = alpha * 0.3;
-                        ctx.fillStyle = `hsla(${hue}, ${saturation}%, ${lightness + 15}%, 0.3)`;
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.currentSize * 1.5, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.globalAlpha = 1.0;
-                    }
-                    
-                    if (this.life > 0.8 && Math.random() < 0.3) {
-                        ctx.strokeStyle = `hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha * 0.2})`;
-                        ctx.lineWidth = this.currentSize * 0.5;
-                        ctx.lineCap = 'round';
-                        ctx.beginPath();
-                        ctx.moveTo(this.x, this.y);
-                        ctx.lineTo(
-                            this.x - this.vx * 0.02,
-                            this.y - this.vy * 0.02
-                        );
-                        ctx.stroke();
-                    }
-                }
-            }
-            
-            // 普通粒子类 - 增强参数方程支持
-            class Particle {
-                constructor(x, y, colorConfig, explosionPower = 1, explosionPattern = 'circle') {
-                    this.x = x;
-                    this.y = y;
-                    this.colorConfig = colorConfig;
-                    this.explosionPower = explosionPower;
-                    this.explosionPattern = explosionPattern;
-                    
-                    const sizeMultiplier = explosionPattern.includes('SPARKLE') ? 0.82 : 0.98;
-                    this.baseSize = random(0.9, 2.3) * sizeMultiplier;
-                    this.currentSize = this.baseSize;
-                    
-                    this.isFireSpark = true;
-                    this.fireSparkDuration = random(0.12, 0.32);
-                    this.life = 1.0;
-                    this.decayRate = random(0.13, 0.36);
-                    
-                    this.verticalWeight = random(0.55, 1.1);
-                    this.horizontalDrag = AIR_RESISTANCE;
-                    this.verticalDrag = AIR_RESISTANCE;
-                    
-                    this.setupExplosionPattern(explosionPattern, explosionPower);
-                    
-                    this.colorMixRatio = 0;
-                    this.colorMixSpeed = random(0.65, 1.2);
-                    
-                    this.hueShift = random(-14, 14);
-                    this.originalHue = colorConfig.hue;
-                    
-                    this.sparkleFactor = explosionPattern.includes('SPARKLE') ? random(0.1, 0.26) : 0;
-                    this.sparklePhase = random(0, Math.PI * 2);
-                    
-                    this.secondaryExplosionChance = isMobile ? 0.01 : 0.02; // 移动端减少次级爆炸概率
-                    
-                    this.createdAt = Date.now();
-                    
-                    this.useSecondColor = colorConfig.type === 'dual' && Math.random() > 0.5;
-                    this.fadeFactor = 1.5;
-                }
+                // 应用缓动函数计算当前旋转角度
+                // 注意：负号表示顺时针旋转（实际视觉上的顺时针）
+                this.rotation = this.startAngle + (easeOut * totalRotation);
                 
-                setupExplosionPattern(pattern, power) {
-                    const baseSpeed = random(185, 350) * power;
-                    
-                    switch(pattern) {
-                        case EXPLOSION_PATTERNS.CIRCLE:
-                            const angle = random(0, Math.PI * 2);
-                            this.vx = Math.cos(angle) * baseSpeed;
-                            this.vy = Math.sin(angle) * baseSpeed;
-                            break;
-                            
-                        case EXPLOSION_PATTERNS.SPARKLE:
-                            const sparkleAngle = random(0, Math.PI * 2);
-                            this.vx = Math.cos(sparkleAngle) * baseSpeed * 0.65;
-                            this.vy = Math.sin(sparkleAngle) * baseSpeed * 0.65;
-                            break;
-                            
-                        case EXPLOSION_PATTERNS.VORTEX:
-                            const vortexAngle = random(0, Math.PI * 2);
-                            this.vx = Math.cos(vortexAngle) * baseSpeed * 0.55;
-                            this.vy = Math.sin(vortexAngle) * baseSpeed * 0.55;
-                            this.vortexFactor = random(2.5, 5.5);
-                            break;
-                            
-                        case EXPLOSION_PATTERNS.RAINBOW:
-                            const rainbowAngle = random(0, Math.PI * 2);
-                            this.vx = Math.cos(rainbowAngle) * baseSpeed;
-                            this.vy = Math.sin(rainbowAngle) * baseSpeed;
-                            this.rainbowHue = (Date.now() * 0.007 + random(0, 360)) % 360;
-                            break;
-                            
-                        case EXPLOSION_PATTERNS.ELLIPSE:
-                            const ellipseAngle = random(0, Math.PI * 2);
-                            const ellipseFactor = random(0.35, 0.65);
-                            this.vx = Math.cos(ellipseAngle) * baseSpeed;
-                            this.vy = Math.sin(ellipseAngle) * baseSpeed * ellipseFactor;
-                            break;
-                            
-                        // 参数方程：标准圆型
-                        case EXPLOSION_PATTERNS.PARAMETRIC_CIRCLE:
-                            const circleTheta = random(0, Math.PI * 2);
-                            const circleRadius = baseSpeed * random(0.8, 1.2);
-                            this.vx = Math.cos(circleTheta) * circleRadius;
-                            this.vy = Math.sin(circleTheta) * circleRadius;
-                            this.isParametricCircle = true;
-                            this.parametricTheta = circleTheta;
-                            break;
-                            
-                        // 参数方程：椭圆型
-                        case EXPLOSION_PATTERNS.PARAMETRIC_ELLIPSE:
-                            const ellipseTheta = random(0, Math.PI * 2);
-                            const a = baseSpeed * random(1.0, 1.5);
-                            const b = baseSpeed * random(0.5, 1.0);
-                            this.vx = Math.cos(ellipseTheta) * a;
-                            this.vy = Math.sin(ellipseTheta) * b;
-                            this.isParametricEllipse = true;
-                            this.parametricTheta = ellipseTheta;
-                            this.a = a;
-                            this.b = b;
-                            break;
-                            
-                        // 参数方程：星型
-                        case EXPLOSION_PATTERNS.PARAMETRIC_STAR:
-                            const starTheta = random(0, Math.PI * 2);
-                            const starSize = baseSpeed * random(0.7, 1.3);
-                            const cos3 = Math.pow(Math.cos(starTheta), 3);
-                            const sin3 = Math.pow(Math.sin(starTheta), 3);
-                            this.vx = cos3 * starSize;
-                            this.vy = sin3 * starSize;
-                            this.isParametricStar = true;
-                            this.parametricTheta = starTheta;
-                            this.starTwinkleSpeed = random(3.0, 5.0);
-                            this.starTwinklePhase = random(0, Math.PI * 2);
-                            break;
-                            
-                        default:
-                            const normalAngle = random(0, Math.PI * 2);
-                            this.vx = Math.cos(normalAngle) * baseSpeed;
-                            this.vy = Math.sin(normalAngle) * baseSpeed;
-                            break;
-                    }
-                    
-                    if (!pattern.includes('PARAMETRIC')) {
-                        this.vx += random(-35, 35);
-                        this.vy += random(-35, 35);
-                    }
-                }
+                // 重新绘制
+                this.drawWheel();
                 
-                update(deltaTime) {
-                    const deltaSeconds = deltaTime / 1000;
-                    
-                    // 处理参数方程模式下的特殊运动
-                    if (this.isParametricCircle || this.isParametricEllipse || this.isParametricStar) {
-                        this.parametricTheta += deltaSeconds * 1.5;
-                        
-                        if (this.isParametricCircle) {
-                            const radius = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-                            this.vx = Math.cos(this.parametricTheta) * radius;
-                            this.vy = Math.sin(this.parametricTheta) * radius;
-                        } else if (this.isParametricEllipse) {
-                            this.vx = Math.cos(this.parametricTheta) * this.a;
-                            this.vy = Math.sin(this.parametricTheta) * this.b;
-                        } else if (this.isParametricStar) {
-                            const cos3 = Math.pow(Math.cos(this.parametricTheta), 3);
-                            const sin3 = Math.pow(Math.sin(this.parametricTheta), 3);
-                            const starSize = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-                            this.vx = cos3 * starSize;
-                            this.vy = sin3 * starSize;
-                            
-                            // 星型闪烁效果
-                            this.currentSize = this.baseSize * (1 + Math.sin(Date.now() * 0.001 * this.starTwinkleSpeed + this.starTwinklePhase) * 0.3);
-                        }
-                    }
-                    
-                    this.x += this.vx * deltaSeconds;
-                    this.y += this.vy * deltaSeconds;
-                    
-                    this.vy += GRAVITY * this.verticalWeight * deltaSeconds;
-                    this.vx += WIND * random(-0.016, 0.016) * deltaSeconds;
-                    
-                    this.vx *= Math.pow(this.horizontalDrag, deltaSeconds * 60);
-                    this.vy *= Math.pow(this.verticalDrag, deltaSeconds * 60);
-                    
-                    this.life -= this.decayRate * deltaSeconds;
-                    
-                    const aliveTime = (Date.now() - this.createdAt) / 1000;
-                    if (this.isFireSpark && aliveTime > this.fireSparkDuration) {
-                        this.isFireSpark = false;
-                    }
-                    
-                    if (!this.isFireSpark && this.colorMixRatio < 1) {
-                        this.colorMixRatio = Math.min(1, this.colorMixRatio + this.colorMixSpeed * deltaSeconds);
-                    }
-                    
-                    this.currentSize = this.baseSize * this.life;
-                    
-                    if (this.explosionPattern === EXPLOSION_PATTERNS.VORTEX) {
-                        const spiralTime = Date.now() * 0.001;
-                        this.vx += Math.cos(spiralTime + this.x * 0.01) * this.vortexFactor;
-                        this.vy += Math.sin(spiralTime + this.y * 0.01) * this.vortexFactor;
-                    }
-                    
-                    if (this.sparkleFactor > 0) {
-                        this.currentSize *= 1 + Math.sin(Date.now() * 0.006 + this.sparklePhase) * this.sparkleFactor;
-                    }
-                    
-                    if (this.explosionPattern === EXPLOSION_PATTERNS.RAINBOW) {
-                        this.rainbowHue = (this.rainbowHue + deltaSeconds * 110) % 360;
-                    }
-                    
-                    if (this.currentSize > 4.5 && Math.random() < this.secondaryExplosionChance * deltaSeconds * 60) {
-                        this.createSecondaryExplosion();
-                    }
-                    
-                    return this.life > 0 && this.y < canvas.height + 90;
-                }
-                
-                createSecondaryExplosion() {
-                    const secondaryCount = isMobile ? randomInt(2, 8) : randomInt(4, 12);
-                    for (let i = 0; i < secondaryCount; i++) {
-                        const secondaryParticle = new Particle(
-                            this.x,
-                            this.y,
-                            this.colorConfig,
-                            this.explosionPower * 0.25,
-                            'sparkle'
-                        );
-                        secondaryParticle.baseSize = random(0.4, 1.3);
-                        secondaryParticle.decayRate = random(0.25, 0.55);
-                        particles.push(secondaryParticle);
-                    }
-                }
-                
-                draw(ctx) {
-                    const alpha = Math.max(0, 1 - (1 - this.life) * this.fadeFactor);
-                    
-                    let color;
-                    if (this.isFireSpark) {
-                        const brightness = 88 + Math.sin(Date.now() * 0.0035) * 7;
-                        color = `hsla(60, 100%, ${brightness}%, ${alpha * 0.88})`;
-                    } else {
-                        let hue, saturation, lightness;
-                        
-                        if (this.explosionPattern === EXPLOSION_PATTERNS.RAINBOW) {
-                            hue = this.rainbowHue;
-                            saturation = 100;
-                            lightness = 72;
-                        } else if (this.colorConfig.type === 'dual' && this.useSecondColor) {
-                            hue = this.colorConfig.secondHue;
-                            saturation = this.colorConfig.secondSaturation;
-                            lightness = this.colorConfig.secondLightness;
-                        } else {
-                            hue = (this.originalHue + this.hueShift * this.colorMixRatio) % 360;
-                            saturation = this.colorConfig.saturation;
-                            lightness = this.colorConfig.lightness;
-                        }
-                        
-                        const mixedHue = hue;
-                        const mixedSaturation = saturation * this.colorMixRatio;
-                        const mixedLightness = 68 + (lightness - 68) * this.colorMixRatio;
-                        
-                        color = `hsla(${mixedHue}, ${mixedSaturation}%, ${mixedLightness}%, ${alpha * 0.82})`;
-                    }
-                    
-                    ctx.fillStyle = color;
-                    
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.currentSize, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    if (this.life > 0.5) {
-                        ctx.globalAlpha = this.life * 0.28;
-                        ctx.fillStyle = this.isFireSpark ? 'rgba(255, 255, 235, 0.45)' : `hsla(${this.colorConfig.hue}, 62%, 78%, 0.28)`;
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, this.currentSize * 1.18, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.globalAlpha = 1.0;
-                    }
-                }
-            }
-            
-            // 烟花类 - 移动端优化：减少爆炸次数
-            class Firework {
-                constructor(x, targetY, colorConfig) {
-                    this.x = x;
-                    this.y = canvas.height;
-                    this.targetY = targetY;
-                    this.colorConfig = colorConfig;
-                    
-                    this.speed = random(380, 620);
-                    
-                    this.exploded = false;
-                    this.explosionPower = random(1.25, 2.1);
-                    this.explosionPattern = getRandomExplosionPattern();
-                    
-                    this.lineLength = random(11, 28);
-                    this.lineWidth = 1.1;
-                    this.lineColor = `hsla(60, 100%, 82%, 0.55)`;
-                    
-                    this.createdAt = Date.now();
-                    
-                    // 移动端减少爆炸次数
-                    this.explosionCount = 0;
-                    this.maxExplosions = isMobile ? randomInt(2, 4) : randomInt(3, 6);
-                    
-                    this.playLaunchSound();
-                }
-                
-                playLaunchSound() {
-                    try {
-                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        const oscillator = audioContext.createOscillator();
-                        const gainNode = audioContext.createGain();
-                        
-                        oscillator.connect(gainNode);
-                        gainNode.connect(audioContext.destination);
-                        
-                        oscillator.type = 'sine';
-                        oscillator.frequency.setValueAtTime(370, audioContext.currentTime);
-                        oscillator.frequency.exponentialRampToValueAtTime(650, audioContext.currentTime + 0.26);
-                        
-                        gainNode.gain.setValueAtTime(0.09, audioContext.currentTime);
-                        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.31);
-                        
-                        oscillator.start(audioContext.currentTime);
-                        oscillator.stop(audioContext.currentTime + 0.31);
-                    } catch (error) {}
-                }
-                
-                update(deltaTime) {
-                    if (!this.exploded) {
-                        const deltaSeconds = deltaTime / 1000;
-                        
-                        this.y -= this.speed * deltaSeconds;
-                        
-                        if (this.y <= this.targetY) {
-                            this.explode();
-                            return false;
-                        }
-                        
-                        return true;
-                    }
-                    
-                    return false;
-                }
-                
-                explode() {
-                    this.exploded = true;
-                    this.explosionCount++;
-                    
-                    // 移动端减少爆炸威力
-                    const powerMultiplier = isMobile ? 1.0 : 1.2;
-                    this.createExplosion(this.x, this.y, this.explosionPower * powerMultiplier, this.explosionPattern);
-                    
-                    // 移动端减少后续爆炸次数和延迟
-                    if (this.explosionCount < this.maxExplosions) {
-                        const nextExplosionDelay = isMobile ? random(150, 400) : random(120, 350);
-                        setTimeout(() => {
-                            this.createSubsequentExplosion();
-                        }, nextExplosionDelay);
-                    }
-                }
-                
-                createSubsequentExplosion() {
-                    this.explosionCount++;
-                    
-                    const distance = random(70, 185);
-                    const angle = random(0, Math.PI * 2);
-                    
-                    const newX = this.x + Math.cos(angle) * distance;
-                    const newY = this.y + Math.sin(angle) * distance;
-                    
-                    // 移动端减少后续爆炸威力
-                    const subExplosionPower = this.explosionPower * (isMobile ? random(0.5, 0.8) : random(0.6, 0.9));
-                    
-                    this.createExplosion(newX, newY, subExplosionPower, this.explosionPattern);
-                    
-                    // 移动端减少额外爆炸机会
-                    if (this.explosionCount < this.maxExplosions) {
-                        const nextExplosionDelay = isMobile ? random(150, 400) : random(120, 350);
-                        setTimeout(() => {
-                            this.createSubsequentExplosion();
-                        }, nextExplosionDelay);
-                    } else if (!isMobile && Math.random() < 0.3 && this.explosionCount < this.maxExplosions + 2) {
-                        // PC端30%的几率额外增加1-2次爆炸，移动端不增加
-                        const extraDelay = random(150, 400);
-                        setTimeout(() => {
-                            this.createSubsequentExplosion();
-                        }, extraDelay);
-                        this.maxExplosions += randomInt(1, 2);
-                    }
-                }
-                
-                createExplosion(x, y, power, pattern) {
-                    // 移动端减少所有爆炸类型的粒子数量
-                    if (pattern === EXPLOSION_PATTERNS.HEART) {
-                        heartExplosions.push(new HeartExplosionManager(x, y, this.colorConfig, power));
-                        return;
-                    }
-                    
-                    if (pattern === EXPLOSION_PATTERNS.METEOR_SHOWER) {
-                        this.createMeteorShower(x, y, power);
-                        return;
-                    }
-                    
-                    if (pattern === EXPLOSION_PATTERNS.FIRE_TREE) {
-                        this.createFireTree(x, y, power);
-                        return;
-                    }
-                    
-                    if (pattern === EXPLOSION_PATTERNS.CHRYSANTHEMUM) {
-                        this.createChrysanthemum(x, y, power);
-                        return;
-                    }
-                    
-                    if (pattern === EXPLOSION_PATTERNS.SPIRAL_PARAMETRIC) {
-                        this.createParametricSpiral(x, y, power);
-                        return;
-                    }
-                    
-                    this.createNormalExplosion(x, y, power, pattern);
-                }
-                
-                createParametricSpiral(x, y, power) {
-                    // 移动端减少粒子数量
-                    const baseParticleCount = isMobile ? randomInt(40, 70) : randomInt(60, 100);
-                    const particleCount = Math.floor(baseParticleCount * particleMultiplier);
-                    
-                    for (let i = 0; i < particleCount; i++) {
-                        particles.push(new ParametricSpiralParticle(
-                            x,
-                            y,
-                            this.colorConfig,
-                            power
-                        ));
-                    }
-                    
-                    const baseCenterCount = isMobile ? randomInt(12, 25) : randomInt(20, 40);
-                    const centerCount = Math.floor(baseCenterCount * particleMultiplier);
-                    for (let i = 0; i < centerCount; i++) {
-                        const angle = random(0, Math.PI * 2);
-                        const speed = random(80, 180) * power;
-                        const spark = new Particle(
-                            x,
-                            y,
-                            this.colorConfig,
-                            power * 0.6,
-                            'sparkle'
-                        );
-                        spark.vx = Math.cos(angle) * speed;
-                        spark.vy = Math.sin(angle) * speed;
-                        spark.baseSize = random(0.8, 1.8);
-                        spark.decayRate = random(0.25, 0.45);
-                        particles.push(spark);
-                    }
-                }
-                
-                createMeteorShower(x, y, power) {
-                    // 移动端减少流星数量
-                    const baseMeteorCount = isMobile ? randomInt(6, 12) : randomInt(9, 16);
-                    const meteorCount = Math.floor(baseMeteorCount * particleMultiplier);
-                    
-                    for (let i = 0; i < meteorCount; i++) {
-                        const meteor = new Meteor(
-                            x + random(-32, 32),
-                            y + random(-32, 32),
-                            this.colorConfig
-                        );
-                        meteor.speed *= power;
-                        particles.push(meteor);
-                    }
-                    
-                    const baseSparkCount = isMobile ? randomInt(15, 30) : randomInt(22, 45);
-                    const sparkCount = Math.floor(baseSparkCount * particleMultiplier);
-                    for (let i = 0; i < sparkCount; i++) {
-                        const spark = new Particle(
-                            x + random(-45, 45),
-                            y + random(-45, 45),
-                            this.colorConfig,
-                            power * 0.45,
-                            'sparkle'
-                        );
-                        spark.baseSize = random(0.4, 1.4);
-                        spark.decayRate = random(0.18, 0.38);
-                        particles.push(spark);
-                    }
-                }
-                
-                createFireTree(x, y, power) {
-                    // 移动端减少火树数量
-                    const baseTreeCount = isMobile ? randomInt(30, 50) : randomInt(45, 75);
-                    const treeCount = Math.floor(baseTreeCount * particleMultiplier);
-                    
-                    for (let i = 0; i < treeCount; i++) {
-                        const fireTreeParticle = new FireTreeParticle(
-                            x + random(-22, 22),
-                            y + random(-22, 22),
-                            this.colorConfig
-                        );
-                        fireTreeParticle.baseSize *= power * 0.85;
-                        fireTreeParticle.fallSpeed *= power;
-                        particles.push(fireTreeParticle);
-                    }
-                    
-                    const baseSparkCount = isMobile ? randomInt(15, 30) : randomInt(25, 45);
-                    const sparkCount = Math.floor(baseSparkCount * particleMultiplier);
-                    for (let i = 0; i < sparkCount; i++) {
-                        const spark = new Particle(
-                            x + random(-32, 32),
-                            y + random(-32, 32),
-                            this.colorConfig,
-                            power * 0.55,
-                            'sparkle'
-                        );
-                        spark.baseSize = random(0.9, 2.0);
-                        spark.decayRate = random(0.28, 0.55);
-                        spark.sparkleFactor = random(0.35, 0.65);
-                        particles.push(spark);
-                    }
-                }
-                
-                createChrysanthemum(x, y, power) {
-                    // 移动端减少彩菊粒子数量
-                    const baseParticleCount = isMobile ? randomInt(70, 110) : randomInt(110, 170);
-                    const particleCount = Math.floor(baseParticleCount * particleMultiplier);
-                    
-                    for (let i = 0; i < particleCount; i++) {
-                        particles.push(new ChrysanthemumParticle(
-                            x,
-                            y,
-                            this.colorConfig,
-                            power
-                        ));
-                    }
-                    
-                    const sparkCount = Math.floor(particleCount * (isMobile ? 0.25 : 0.35));
-                    for (let i = 0; i < sparkCount; i++) {
-                        const spark = new ChrysanthemumParticle(
-                            x + random(-13, 13),
-                            y + random(-13, 13),
-                            this.colorConfig,
-                            power * 0.65
-                        );
-                        spark.baseSize = random(0.4, 1.6);
-                        spark.decayRate = random(0.22, 0.45);
-                        particles.push(spark);
-                    }
-                }
-                
-                createNormalExplosion(x, y, power, pattern) {
-                    // 移动端减少普通爆炸粒子数量
-                    const baseParticleCount = this.getParticleCountByPattern(pattern);
-                    const particleCount = Math.floor(baseParticleCount * particleMultiplier);
-                    
-                    for (let i = 0; i < particleCount; i++) {
-                        particles.push(new Particle(
-                            x,
-                            y,
-                            this.colorConfig,
-                            power,
-                            pattern
-                        ));
-                    }
-                    
-                    const sparkCount = Math.floor(particleCount * (isMobile ? 0.25 : 0.35));
-                    for (let i = 0; i < sparkCount; i++) {
-                        const spark = new Particle(
-                            x + random(-14, 14),
-                            y + random(-14, 14),
-                            this.colorConfig,
-                            power * 0.65,
-                            pattern === EXPLOSION_PATTERNS.SPARKLE ? pattern : 'sparkle'
-                        );
-                        spark.baseSize = random(0.4, 1.6);
-                        spark.decayRate = random(0.22, 0.42);
-                        particles.push(spark);
-                    }
-                }
-                
-                getParticleCountByPattern(pattern) {
-                    // 移动端减少所有模式的粒子基数
-                    const mobileFactor = isMobile ? 0.7 : 1;
-                    
-                    switch(pattern) {
-                        case EXPLOSION_PATTERNS.CIRCLE:
-                            return Math.floor(randomInt(85, 130) * mobileFactor);
-                        case EXPLOSION_PATTERNS.SPARKLE:
-                            return Math.floor(randomInt(95, 150) * mobileFactor);
-                        case EXPLOSION_PATTERNS.VORTEX:
-                            return Math.floor(randomInt(90, 140) * mobileFactor);
-                        case EXPLOSION_PATTERNS.RAINBOW:
-                            return Math.floor(randomInt(115, 170) * mobileFactor);
-                        case EXPLOSION_PATTERNS.ELLIPSE:
-                            return Math.floor(randomInt(65, 115) * mobileFactor);
-                        case EXPLOSION_PATTERNS.PARAMETRIC_CIRCLE:
-                            return Math.floor(randomInt(100, 150) * mobileFactor);
-                        case EXPLOSION_PATTERNS.PARAMETRIC_ELLIPSE:
-                            return Math.floor(randomInt(80, 130) * mobileFactor);
-                        case EXPLOSION_PATTERNS.PARAMETRIC_STAR:
-                            return Math.floor(randomInt(120, 180) * mobileFactor);
-                        case EXPLOSION_PATTERNS.SPIRAL_PARAMETRIC:
-                            return Math.floor(randomInt(60, 100) * mobileFactor);
-                        default:
-                            return Math.floor(randomInt(65, 115) * mobileFactor);
-                    }
-                }
-                
-                draw(ctx) {
-                    if (!this.exploded) {
-                        const lineEndY = this.y + this.lineLength;
-                        if (lineEndY < canvas.height) {
-                            ctx.strokeStyle = this.lineColor;
-                            ctx.lineWidth = this.lineWidth;
-                            ctx.beginPath();
-                            ctx.moveTo(this.x, lineEndY);
-                            ctx.lineTo(this.x, this.y);
-                            ctx.stroke();
-                        }
-                        
-                        ctx.fillStyle = 'hsla(60, 100%, 87%, 0.85)';
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, 2.0, 0, Math.PI * 2);
-                        ctx.fill();
-                        
-                        ctx.globalAlpha = 0.38;
-                        ctx.fillStyle = 'hsla(60, 100%, 82%, 0.45)';
-                        ctx.beginPath();
-                        ctx.arc(this.x, this.y, 3.2, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.globalAlpha = 1.0;
-                    }
-                }
-            }
-            
-            // 烟花创建函数
-            function createRandomFirework() {
-                if (Math.random() < 0.22) return;
-                
-                const x = random(50, canvas.width - 50);
-                const targetY = random(canvas.height * 0.2, canvas.height * EXPLOSION_HEIGHT_RATIO);
-                const colorConfig = getRandomColorConfig();
-                
-                fireworks.push(new Firework(x, targetY, colorConfig));
-            }
-            
-            // 创建特殊烟花 - 移动端减少特殊烟花概率
-            function createSpecialFirework() {
-                if (isMobile && Math.random() < 0.7) return; // 移动端70%不创建特殊烟花
-                if (!isMobile && Math.random() < 0.5) return;
-                
-                const x = random(100, canvas.width - 100);
-                const targetY = random(canvas.height * 0.15, canvas.height * 0.32);
-                const colorConfig = getRandomColorConfig();
-                
-                const specialFirework = new Firework(x, targetY, colorConfig);
-                specialFirework.explosionPower *= isMobile ? 1.2 : 1.45;
-                specialFirework.maxExplosions = isMobile ? randomInt(3, 5) : randomInt(4, 8);
-                fireworks.push(specialFirework);
-            }
-            
-            // 自动发射系统 - 移动端减少发射频率
-            function startAutoFire() {
-                if (isAutoFiring) return;
-                
-                isAutoFiring = true;
-                
-                // 初始发射烟花数量根据设备调整
-                setTimeout(() => createRandomFirework(), 300);
-                setTimeout(() => createRandomFirework(), 600);
-                if (!isMobile || Math.random() > 0.5) {
-                    setTimeout(() => createSpecialFirework(), 900);
-                }
-                setTimeout(() => createRandomFirework(), 1200);
-                setTimeout(() => createRandomFirework(), 1500);
-                
-                autoFireInterval = setInterval(() => {
-                    const now = Date.now();
-                    const fireworkInterval = isMobile ? 1100 : 900;
-                    if (now - lastFireworkTime > fireworkInterval) {
-                        // 移动端减少每次发射的烟花数量
-                        let count;
-                        if (isMobile) {
-                            count = Math.random() > 0.6 ? 2 : 1;
-                        } else {
-                            count = Math.random() > 0.3 ? 3 : (Math.random() > 0.5 ? 2 : 1);
-                        }
-                        
-                        for (let i = 0; i < count; i++) {
-                            setTimeout(() => {
-                                if (isMobile) {
-                                    if (Math.random() > 0.8) { // 移动端只有20%概率创建特殊烟花
-                                        createSpecialFirework();
-                                    } else {
-                                        createRandomFirework();
-                                    }
-                                } else {
-                                    if (Math.random() > 0.6) {
-                                        createSpecialFirework();
-                                    } else {
-                                        createRandomFirework();
-                                    }
-                                }
-                            }, i * (isMobile ? 150 : 120));
-                        }
-                        lastFireworkTime = now;
-                    }
-                }, isMobile ? 1100 : 900);
-            }
-            
-            // 使用requestAnimationFrame的动画循环
-            function animate(currentTime) {
-                const deltaTime = currentTime - lastTime || 0;
-                lastTime = currentTime;
-                
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.11)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                for (let i = fireworks.length - 1; i >= 0; i--) {
-                    const firework = fireworks[i];
-                    if (!firework.update(deltaTime)) {
-                        fireworks.splice(i, 1);
-                    } else {
-                        firework.draw(ctx);
-                    }
-                }
-                
-                for (let i = heartExplosions.length - 1; i >= 0; i--) {
-                    if (!heartExplosions[i].update(deltaTime)) {
-                        heartExplosions.splice(i, 1);
-                    } else {
-                        heartExplosions[i].draw(ctx);
-                    }
-                }
-                
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    const particle = particles[i];
-                    if (!particle.update(deltaTime)) {
-                        particles.splice(i, 1);
-                    } else {
-                        particle.draw(ctx);
-                    }
-                }
-                
-                // 移动端减少粒子上限
-                const maxParticles = isMobile ? 1500 : 2200;
-                const keepParticles = isMobile ? 1300 : 1900;
-                if (particles.length > maxParticles) {
-                    particles.splice(0, particles.length - keepParticles);
-                }
-                
-                if (fireworks.length > (isMobile ? 8 : 12)) {
-                    fireworks.splice(0, fireworks.length - (isMobile ? 6 : 10));
-                }
-                
-                if (heartExplosions.length > (isMobile ? 3 : 4)) {
-                    heartExplosions.splice(0, heartExplosions.length - (isMobile ? 2 : 3));
-                }
-                
-                animationId = requestAnimationFrame(animate);
-            }
-            
-            // 初始化音乐
-            function initMusic() {
-                bgMusic.volume = 0.38;
-                
-                setTimeout(() => {
-                    const playPromise = bgMusic.play();
-                    if (playPromise !== undefined) {
-                        playPromise.catch(() => {});
-                    }
-                }, 1100);
-            }
-            
-            // 页面可见性API
-            let isPageVisible = true;
-            
-            document.addEventListener('visibilitychange', function() {
-                isPageVisible = !document.hidden;
-                
-                if (!isPageVisible) {
-                    if (animationId) {
-                        cancelAnimationFrame(animationId);
-                        animationId = null;
-                    }
-                    if (bgMusic) {
-                        bgMusic.pause();
-                    }
+                // 检查是否完成
+                if (progress < 1) {
+                    this.animationId = requestAnimationFrame(() => this.animate());
                 } else {
-                    if (!animationId) {
-                        lastTime = performance.now();
-                        animate(lastTime);
-                    }
-                    if (bgMusic.paused) {
-                        bgMusic.play().catch(() => {});
-                    }
+                    this.finishSpin();
                 }
-            });
-            
-            function initFireworksSystem() {
-                initMusic();
-                
-                lastTime = performance.now();
-                animate(lastTime);
-                
-                startAutoFire();
             }
             
-            initFireworksSystem();
+            finishSpin() {
+                this.isSpinning = false;
+                this.spinBtn.disabled = false;
+                this.stopBtn.disabled = true;
+                
+                // 显示结果 - 固定显示神秘礼包
+                const selectedPrize = this.prizes[1]; // 直接使用索引1
+                const fullName = '神秘大礼包'; // 固定显示完整名称
+                
+                this.resultEl.textContent = `🎉 ${fullName}`;
+                this.resultEl.style.background = selectedPrize.color;
+                this.resultEl.classList.add('show');
+            }
+            
+            stopSpin() {
+                if (!this.isSpinning) return;
+                
+                this.isSpinning = false;
+                cancelAnimationFrame(this.animationId);
+                this.finishSpin();
+            }
+            
+            reset() {
+                if (this.isSpinning) {
+                    cancelAnimationFrame(this.animationId);
+                    this.isSpinning = false;
+                }
+                
+                // 重置到起始位置（再来一次）
+                this.rotation = this.startAngle;
+                this.spinSpeed = 0;
+                this.targetPrizeIndex = 1;
+                this.spinBtn.disabled = false;
+                this.stopBtn.disabled = true;
+                this.resultEl.classList.remove('show');
+                
+                this.drawWheel();
+            }
+            
+            createSparkles() {
+                // 创建背景闪烁效果
+                for (let i = 0; i < 30; i++) {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'sparkle';
+                    sparkle.style.left = `${Math.random() * 100}vw`;
+                    sparkle.style.top = `${Math.random() * 100}vh`;
+                    sparkle.style.animationDelay = `${Math.random() * 2}s`;
+                    sparkle.style.opacity = Math.random() * 0.5 + 0.2;
+                    document.body.appendChild(sparkle);
+                }
+            }
         }
         
-        // 性能优化：简化事件监听
-        document.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-        }, { passive: false });
-        
-        document.addEventListener('keydown', function(e) {
-            if ([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
-                e.preventDefault();
-            }
-        }, false);
+        // 初始化转盘
+        const lotteryWheel = new SimpleLotteryWheel();
     </script>
 </body>
 </html>
