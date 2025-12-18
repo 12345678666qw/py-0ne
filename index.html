@@ -687,6 +687,7 @@
             const finalText = document.getElementById('finalText');
             const statementDisplay = document.getElementById('statementDisplay');
             const statementContent = document.getElementById('statementContent');
+            const bgMusic = document.getElementById('bgMusic');
             
             // 状态变量
             let currentName = '';
@@ -826,6 +827,27 @@
             function showPage3() {
                 page3.classList.add('active');
                 
+                // 立即播放背景音乐
+                try {
+                    bgMusic.volume = 0.3; // 设置合适的音量
+                    bgMusic.currentTime = 0; // 从头开始播放
+                    const playPromise = bgMusic.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.catch(error => {
+                            console.log("自动播放被阻止，需要用户交互");
+                            // 如果自动播放被阻止，我们添加一个点击事件来重新尝试
+                            document.addEventListener('click', function tryPlayMusic() {
+                                bgMusic.play().then(() => {
+                                    document.removeEventListener('click', tryPlayMusic);
+                                });
+                            }, { once: true });
+                        });
+                    }
+                } catch (error) {
+                    console.error("播放音乐失败:", error);
+                }
+                
                 // 开始烟花系统
                 initFireworksSystem();
                 
@@ -948,7 +970,6 @@
             function initFireworksSystem() {
                 const canvas = document.getElementById('fireworksCanvas');
                 const ctx = canvas.getContext('2d', { alpha: true });
-                const bgMusic = document.getElementById('bgMusic');
                 
                 function resizeCanvas() {
                     canvas.width = window.innerWidth;
@@ -2605,18 +2626,6 @@
                     fireworksAnimationId = requestAnimationFrame(animate);
                 }
                 
-                // 初始化音乐
-                function initMusic() {
-                    bgMusic.volume = 0.38;
-                    
-                    setTimeout(() => {
-                        const playPromise = bgMusic.play();
-                        if (playPromise !== undefined) {
-                            playPromise.catch(() => {});
-                        }
-                    }, 1100);
-                }
-                
                 // 页面可见性API
                 let isPageVisible = true;
                 
@@ -2644,8 +2653,6 @@
                 
                 // 初始化烟花系统
                 function initFireworksSystem() {
-                    initMusic();
-                    
                     lastTime = performance.now();
                     animate(lastTime);
                     
@@ -2684,6 +2691,12 @@
                 if (fireworksSystem) {
                     fireworksSystem.stop();
                     fireworksSystem = null;
+                }
+                
+                // 暂停音乐
+                if (bgMusic) {
+                    bgMusic.pause();
+                    bgMusic.currentTime = 0;
                 }
                 
                 // 隐藏第三页
