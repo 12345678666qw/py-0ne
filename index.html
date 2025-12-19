@@ -875,6 +875,7 @@
             
             // 状态变量
             let currentName = '';
+            let musicPlayed = false;
             
             // 三种特效类型
             const effects = [
@@ -891,7 +892,7 @@
                 "高俊杰": "星枢转岁，元朔焕新。高君俊杰，艺夺天工。积木化妲己，灵狐降世，魅影流形，巧夺造化。愿君新岁：以榫卯为戟，破局如妲己之狐火燎原；以匠心为楫，破浪似王者之狮舞穿云。技压峡谷，名耀天榜，岁添锦绣，福蕴琼枝。元旦嘉辰，与君共庆，愿春风携电竞之辉，永驻君怀！",
                 "周敏毅": "元辰启瑞，岁序更新。吾儿如光头强，当护林守正；似青松，须傲雪而立。若效达摩，必踢云破壁，勇者无畏！父望汝以「巧思破局」为楫，以「真言·心经」为帆，新岁安康，伐木成林，步履铿锵，勇夺「森林勋章」，名震「狗熊岭」；更期如金莲踏浪，似狮舞震峡谷，终成「天选之人」，王者加冕！",
                 "徐宇航": "新元启，阿离伞舞映流光；岁序转，花信风携少年狂。愿君如红叶翩跹破霜寒，似纸鸢扶摇入云长。以「芳华」为笔绘山河，以「初心」为锚定星芒。元旦安康，且看峡谷花开处，尽是凌云志未央！",
-                "王翔": "维公元二〇二X年元日，谨祝王翔君曰：\n元辰肇启，瑞气盈寰。值此新岁，愿君如朝阳初升，辉光日新；似鲲鹏振翼，志凌霄汉。昔年砥柱中流，协谋克艰；今岁砺戈秣马，再拓宏图。三江汇流，以成其势；众志成城，以就其功。愿君怀瑾握瑜，德才并砺；率我同仁，协契如磐。战术精研，若棋局运筹；协同无间，似战阵合一。使三角洲之名，如北斗悬天，指引方遒；如战旗猎猎，威震八荒。",
+                "王翔": "维公元二〇二六年元日，谨祝王翔君曰：\n元辰肇启，瑞气盈寰。值此新岁，愿君如朝阳初升，辉光日新；似鲲鹏振翼，志凌霄汉。昔年砥柱中流，协谋克艰；今岁砺戈秣马，再拓宏图。三江汇流，以成其势；众志成城，以就其功。愿君怀瑾握瑜，德才并砺；率我同仁，协契如磐。战术精研，若棋局运筹；协同无间，似战阵合一。使三角洲之名，如北斗悬天，指引方遒；如战旗猎猎，威震八荒。",
                 "周旭": "元日启新，瑞霭盈门。\n贺周旭君：  \n昔岁无畏，契结英魂；  \n今岁砺锋，再战乾坤。  \n战术如渊，莫测深浅；  \n勇毅似火，焚尽荆棘。  \n愿君怀璧其德，率众如龙；  \n使契约之名，耀若辰星。  \n新岁安康，诸事顺遂；  \n鹏程万里，共赴荣光！",
                 "都俊琦": "都俊琦卿，元旦安康！愿两情缱绻，朝朝暮暮，相濡以沫，岁岁常相伴，甜蜜永绵长。",
                 "刘子山": "元日贺子山兄：\n岁启新元，愿君如芝兰清雅，才学日进；似青松凌云，志气长青。学业精，体康健，情谊长，共赴锦程！",
@@ -903,6 +904,56 @@
             let fireworksAnimationId = null;
             let isAutoFiring = false;
             let autoFireInterval = null;
+            
+            // 音乐播放控制
+            function playBackgroundMusic() {
+                if (musicPlayed) return;
+                
+                try {
+                    bgMusic.volume = 0.3; // 设置合适的音量
+                    bgMusic.currentTime = 0; // 从头开始播放
+                    
+                    // 尝试播放音乐
+                    const playPromise = bgMusic.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            // 播放成功
+                            musicPlayed = true;
+                            console.log("音乐播放成功");
+                        }).catch(error => {
+                            console.log("自动播放被阻止，需要用户交互:", error);
+                            
+                            // 添加页面点击事件来重新尝试播放
+                            const playOnClick = function() {
+                                bgMusic.play().then(() => {
+                                    musicPlayed = true;
+                                    console.log("音乐点击后播放成功");
+                                    document.removeEventListener('click', playOnClick);
+                                    document.removeEventListener('touchstart', playOnClick);
+                                }).catch(e => {
+                                    console.log("点击后播放仍然失败:", e);
+                                });
+                            };
+                            
+                            document.addEventListener('click', playOnClick);
+                            document.addEventListener('touchstart', playOnClick);
+                        });
+                    }
+                } catch (error) {
+                    console.error("播放音乐失败:", error);
+                }
+            }
+            
+            // 提前预加载音乐（在用户交互时）
+            function preloadMusic() {
+                try {
+                    bgMusic.load();
+                    console.log("音乐预加载完成");
+                } catch (error) {
+                    console.log("音乐预加载失败:", error);
+                }
+            }
             
             // 提交名字函数
             function submitName() {
@@ -926,6 +977,9 @@
                 
                 // 保存名字
                 currentName = name;
+                
+                // 预加载音乐（在用户交互时）
+                preloadMusic();
                 
                 // 切换到名字展示页面
                 showPage2();
@@ -1011,26 +1065,10 @@
             function showPage3() {
                 page3.classList.add('active');
                 
-                // 立即播放背景音乐
-                try {
-                    bgMusic.volume = 0.3; // 设置合适的音量
-                    bgMusic.currentTime = 0; // 从头开始播放
-                    const playPromise = bgMusic.play();
-                    
-                    if (playPromise !== undefined) {
-                        playPromise.catch(error => {
-                            console.log("自动播放被阻止，需要用户交互");
-                            // 如果自动播放被阻止，我们添加一个点击事件来重新尝试
-                            document.addEventListener('click', function tryPlayMusic() {
-                                bgMusic.play().then(() => {
-                                    document.removeEventListener('click', tryPlayMusic);
-                                });
-                            }, { once: true });
-                        });
-                    }
-                } catch (error) {
-                    console.error("播放音乐失败:", error);
-                }
+                // 播放背景音乐
+                setTimeout(() => {
+                    playBackgroundMusic();
+                }, 500);
                 
                 // 开始烟花系统
                 initFireworksSystem();
@@ -2782,7 +2820,7 @@
                             lastTime = performance.now();
                             animate(lastTime);
                         }
-                        if (bgMusic.paused) {
+                        if (bgMusic.paused && musicPlayed) {
                             bgMusic.play().catch(() => {});
                         }
                     }
@@ -2835,6 +2873,9 @@
                     bgMusic.pause();
                     bgMusic.currentTime = 0;
                 }
+                
+                // 重置音乐播放状态
+                musicPlayed = false;
                 
                 // 隐藏第三页
                 page3.classList.remove('active');
@@ -2914,6 +2955,17 @@
             document.addEventListener('touchmove', function(e) {
                 e.preventDefault();
             }, { passive: false });
+            
+            // 页面加载时预加载音乐
+            window.addEventListener('load', function() {
+                // 预加载音乐
+                try {
+                    bgMusic.load();
+                    console.log("音乐预加载完成");
+                } catch (error) {
+                    console.log("音乐预加载失败:", error);
+                }
+            });
         });
     </script>
 </body>
