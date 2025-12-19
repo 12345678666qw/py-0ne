@@ -304,11 +304,11 @@
             display: inline-block;
         }
         
-        /* 新添加的：个性化语句显示区域 - 优化移动端显示 */
+        /* 新添加的：个性化语句显示区域 - 进一步扩大显示框 */
         .statement-display {
             width: 90%;
             max-width: 1200px;
-            margin: 40px auto 0;
+            margin: 20px auto 0; /* 减少上边距，为更大的显示框留出空间 */
             padding: 40px;
             background: rgba(0, 0, 0, 0.6);
             border-radius: 20px;
@@ -316,14 +316,16 @@
             opacity: 0;
             transform: translateY(50px);
             transition: all 1s ease;
-            /* 显著增加最大高度，使文本框更长 */
-            max-height: 600px; /* 从400px增加到600px */
+            /* 大幅增加最大高度，使文本框更长 */
+            max-height: 700px; /* 从600px增加到700px */
             overflow-y: auto;
             display: none;
             position: relative;
             z-index: 20;
             /* 优化移动端滚动 */
             -webkit-overflow-scrolling: touch;
+            /* 添加内部阴影，使滚动更明显 */
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
         
         .statement-display.active {
@@ -346,7 +348,7 @@
             white-space: pre-wrap; /* 保留换行符但允许自动换行 */
         }
         
-        /* 响应式设计 - 优化移动端 */
+        /* 响应式设计 - 进一步优化移动端 */
         @media (max-width: 1200px) {
             .dialogue-text {
                 font-size: 3.5rem;
@@ -370,7 +372,7 @@
             }
             
             .statement-display {
-                max-height: 500px; /* 从350px增加到500px */
+                max-height: 600px; /* 从500px增加到600px */
             }
         }
         
@@ -398,7 +400,7 @@
             }
             
             .statement-display {
-                max-height: 450px; /* 从300px增加到450px */
+                max-height: 550px; /* 从450px增加到550px */
                 padding: 30px;
             }
         }
@@ -463,8 +465,10 @@
             
             .statement-display {
                 padding: 30px 20px;
-                margin-top: 30px;
-                max-height: 400px; /* 从250px增加到400px，使文本框更长 */
+                margin-top: 20px; /* 进一步减少上边距 */
+                max-height: 500px; /* 从400px增加到500px，使文本框更长 */
+                /* 在移动端增加更多内边距 */
+                padding: 25px 20px;
             }
             
             .statement-content {
@@ -516,8 +520,11 @@
             
             .statement-display {
                 padding: 20px 15px;
-                margin-top: 20px;
-                max-height: 350px; /* 从200px增加到350px，使文本框更长 */
+                margin-top: 15px;
+                max-height: 450px; /* 从350px增加到450px，使文本框更长 */
+                /* 调整边框和阴影 */
+                border-width: 1.5px;
+                box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.4);
             }
             
             .statement-content {
@@ -548,13 +555,15 @@
             
             .statement-display {
                 padding: 15px 10px;
-                max-height: 300px; /* 从180px增加到300px，使文本框更长 */
-                margin-top: 15px;
+                max-height: 400px; /* 从300px增加到400px，使文本框更长 */
+                margin-top: 10px;
+                border-radius: 15px; /* 稍微减小圆角 */
             }
             
             .statement-content {
                 font-size: 1.2rem;
                 line-height: 1.5;
+                padding: 8px;
             }
         }
         
@@ -574,12 +583,15 @@
             }
             
             .statement-display {
-                max-height: 280px; /* 从160px增加到280px，使文本框更长 */
+                max-height: 380px; /* 从280px增加到380px，使文本框更长 */
                 padding: 12px 8px;
+                margin-top: 8px;
+                border-radius: 12px;
             }
             
             .statement-content {
                 font-size: 1.1rem;
+                line-height: 1.4;
             }
         }
         
@@ -595,11 +607,44 @@
             }
             
             .statement-display {
-                max-height: 250px; /* 从140px增加到250px，使文本框更长 */
+                max-height: 350px; /* 从250px增加到350px，使文本框更长 */
+                padding: 10px 6px;
+                border-radius: 10px;
             }
             
             .statement-content {
                 font-size: 1rem;
+                line-height: 1.4;
+                padding: 5px;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            /* 针对高度较小的屏幕进行特殊优化 */
+            .statement-display {
+                max-height: 300px; /* 在高度有限的屏幕上减少最大高度 */
+                margin-top: 5px;
+            }
+            
+            .greeting-container {
+                transform: translate(-50%, -50%) scale(0.7);
+            }
+        }
+        
+        @media (max-height: 400px) {
+            /* 针对高度非常小的屏幕进行特殊优化 */
+            .statement-display {
+                max-height: 200px;
+                padding: 8px 5px;
+            }
+            
+            .statement-content {
+                font-size: 0.9rem;
+                line-height: 1.3;
+            }
+            
+            .greeting-container {
+                transform: translate(-50%, -50%) scale(0.6);
             }
         }
         
