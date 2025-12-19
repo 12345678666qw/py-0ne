@@ -259,29 +259,46 @@
             pointer-events: none;
         }
         
-        .final-text {
-            font-size: 10vw;
-            font-weight: 900;
-            color: #ffdd00;
-            text-shadow: 0 0 5px #ff9900;
+        /* 修改后的元旦快乐文字区域 */
+        .greeting-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            line-height: 1.2;
-            padding: 0;
-            margin: 0;
-            display: block;
-            transition: opacity 1s ease;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            max-width: 95%;
+            width: 90%;
+            max-width: 1200px;
+            transition: opacity 1s ease;
             opacity: 0;
-            white-space: normal;
-            overflow: visible;
-            text-overflow: clip;
-            letter-spacing: 1px;
-            word-wrap: break-word;
-            word-break: break-all;
+        }
+        
+        .greeting-container.active {
+            opacity: 1;
+        }
+        
+        /* 朋友名字显示区域 - 移除发光效果 */
+        .friend-name {
+            font-size: 10vw;
+            font-weight: 900;
+            color: #ffdd00;
+            margin-bottom: 10px;
+            line-height: 1.1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+        
+        /* 元旦快乐文字 - 移除发光效果 */
+        .new-year-text {
+            font-size: 12vw;
+            font-weight: 900;
+            color: #ff3333;
+            line-height: 1;
         }
         
         /* 新添加的：个性化语句显示区域 */
@@ -330,8 +347,12 @@
                 font-size: 14rem;
             }
             
-            .final-text {
-                font-size: 12vw;
+            .friend-name {
+                font-size: 11vw;
+            }
+            
+            .new-year-text {
+                font-size: 13vw;
             }
             
             .statement-content {
@@ -348,8 +369,12 @@
                 font-size: 12rem;
             }
             
-            .final-text {
-                font-size: 10vw;
+            .friend-name {
+                font-size: 12vw;
+            }
+            
+            .new-year-text {
+                font-size: 14vw;
             }
             
             .statement-content {
@@ -394,9 +419,16 @@
                 gap: 15px;
             }
             
-            .final-text {
-                font-size: 8vw;
-                gap: 15px;
+            .friend-name {
+                font-size: 13vw;
+                margin-bottom: 5px;
+                white-space: normal;
+                line-height: 1;
+            }
+            
+            .new-year-text {
+                font-size: 15vw;
+                line-height: 0.9;
             }
             
             .statement-display {
@@ -434,10 +466,13 @@
                 flex-direction: column;
             }
             
-            .final-text {
-                font-size: 6vw;
-                gap: 10px;
-                flex-direction: column;
+            .friend-name {
+                font-size: 15vw;
+                margin-bottom: 0;
+            }
+            
+            .new-year-text {
+                font-size: 17vw;
             }
             
             .statement-display {
@@ -457,8 +492,12 @@
                 font-size: 5rem;
             }
             
-            .final-text {
-                font-size: 4.5rem;
+            .friend-name {
+                font-size: 17vw;
+            }
+            
+            .new-year-text {
+                font-size: 19vw;
             }
             
             .statement-display {
@@ -468,6 +507,20 @@
             
             .statement-content {
                 font-size: 1.2rem;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .friend-name {
+                font-size: 19vw;
+            }
+            
+            .new-year-text {
+                font-size: 21vw;
+            }
+            
+            .greeting-container {
+                padding: 0 10px;
             }
         }
         
@@ -654,7 +707,12 @@
     <div id="page3" class="page">
         <canvas id="fireworksCanvas"></canvas>
         <div class="text-container">
-            <div class="final-text" id="finalText"></div>
+            <!-- 修改后的元旦快乐问候区域 -->
+            <div class="greeting-container" id="greetingContainer">
+                <div class="friend-name" id="friendName"></div>
+                <div class="new-year-text" id="newYearText">元旦快乐！</div>
+            </div>
+            
             <div class="statement-display" id="statementDisplay">
                 <div class="statement-content" id="statementContent">
                     <!-- 个性化语句将在这里显示 -->
@@ -684,7 +742,9 @@
             const nameDisplay = document.getElementById('nameDisplay');
             
             // 第三页元素
-            const finalText = document.getElementById('finalText');
+            const greetingContainer = document.getElementById('greetingContainer');
+            const friendName = document.getElementById('friendName');
+            const newYearText = document.getElementById('newYearText');
             const statementDisplay = document.getElementById('statementDisplay');
             const statementContent = document.getElementById('statementContent');
             const bgMusic = document.getElementById('bgMusic');
@@ -858,72 +918,25 @@
             // 显示元旦快乐动画
             function showNewYearGreeting() {
                 // 清空显示区域
-                finalText.innerHTML = '';
+                friendName.textContent = '';
+                greetingContainer.classList.remove('active');
                 statementContent.innerHTML = '';
                 statementDisplay.classList.remove('active');
                 
-                // 格式化问候文本
-                function formatGreetingText(userName) {
-                    if (!userName || userName.trim() === '') {
-                        return '朋友，\n元旦快乐！';
-                    }
-                    
-                    let nameLength = 0;
-                    const name = userName.trim();
-                    
-                    for (let i = 0; i < name.length; i++) {
-                        const charCode = name.charCodeAt(i);
-                        nameLength += (charCode >= 0x4E00 && charCode <= 0x9FFF) ? 2 : 1;
-                    }
-                    
-                    if (nameLength > 6) {
-                        return name + '，<br>元旦快乐！';
-                    } else {
-                        return name + '，\n元旦快乐！';
-                    }
+                // 显示朋友的名字
+                if (currentName && currentName.trim() !== '') {
+                    friendName.textContent = currentName + '，';
+                } else {
+                    friendName.textContent = '朋友，';
                 }
                 
-                // 文字居中优化函数
-                function optimizeTextCentering(textElement) {
-                    if (!textElement) return;
-                    
-                    const text = textElement.innerHTML;
-                    const lineCount = (text.match(/<br\s*\/?>/gi) || []).length + 1;
-                    
-                    // 如果是多行文字，调整行高和字体大小
-                    if (lineCount > 1) {
-                        textElement.style.lineHeight = '1.1';
-                        
-                        // 根据行数调整字体大小
-                        if (lineCount > 2) {
-                            textElement.style.fontSize = '8vw';
-                        }
-                    }
-                    
-                    // 确保文字完全居中
-                    textElement.style.display = 'flex';
-                    textElement.style.flexDirection = 'column';
-                    textElement.style.justifyContent = 'center';
-                    textElement.style.alignItems = 'center';
-                    textElement.style.textAlign = 'center';
-                    
-                    // 重新计算位置
-                    setTimeout(() => {
-                        textElement.style.transform = 'translate(-50%, -50%)';
-                    }, 10);
-                }
-                
-                const greetingHTML = formatGreetingText(currentName);
-                finalText.innerHTML = greetingHTML;
-                finalText.style.opacity = '1';
-                
-                // 应用文字居中优化
-                optimizeTextCentering(finalText);
+                // 显示问候区域
+                greetingContainer.classList.add('active');
                 
                 // 元旦快乐动画完成后2秒，开始显示个性化语句或通用祝福语
                 setTimeout(() => {
                     // 添加元旦快乐文字消失动画
-                    finalText.classList.add('fade-out');
+                    greetingContainer.classList.add('fade-out');
                     
                     // 1秒后隐藏元旦快乐文字，显示个性化语句或通用祝福语
                     setTimeout(() => {
@@ -959,8 +972,8 @@
                     }
                 });
                 
-                // 隐藏元旦快乐文字，显示语句区域
-                finalText.style.display = 'none';
+                // 隐藏问候区域，显示语句区域
+                greetingContainer.style.display = 'none';
                 statementDisplay.classList.add('active');
                 
                 // 不再设置返回第一页的定时器，会一直停留在当前页面
@@ -2716,9 +2729,10 @@
                     nameDisplay.innerHTML = '';
                     
                     // 清空第三页显示区域
-                    finalText.innerHTML = '';
-                    finalText.style.display = 'block';
-                    finalText.classList.remove('fade-out');
+                    greetingContainer.style.display = 'flex';
+                    greetingContainer.classList.remove('active');
+                    greetingContainer.classList.remove('fade-out');
+                    friendName.textContent = '';
                     statementDisplay.classList.remove('active');
                     statementContent.innerHTML = '';
                     
