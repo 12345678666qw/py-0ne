@@ -274,13 +274,14 @@
             max-width: 1200px;
             transition: opacity 1s ease;
             opacity: 0;
+            white-space: nowrap; /* 添加这一行，确保不换行 */
         }
         
         .greeting-container.active {
             opacity: 1;
         }
         
-        /* 朋友名字显示区域 - 移除发光效果 */
+        /* 朋友名字显示区域 */
         .friend-name {
             font-size: 10vw;
             font-weight: 900;
@@ -293,15 +294,17 @@
             max-width: 100%;
         }
         
-        /* 元旦快乐文字 - 移除发光效果 */
+        /* 元旦快乐文字 - 确保在一行显示 */
         .new-year-text {
             font-size: 12vw;
             font-weight: 900;
             color: #ff3333;
             line-height: 1;
+            white-space: nowrap; /* 确保不换行 */
+            display: inline-block;
         }
         
-        /* 新添加的：个性化语句显示区域 */
+        /* 新添加的：个性化语句显示区域 - 优化移动端显示 */
         .statement-display {
             width: 90%;
             max-width: 1200px;
@@ -313,11 +316,14 @@
             opacity: 0;
             transform: translateY(50px);
             transition: all 1s ease;
-            max-height: 400px;
+            /* 显著增加最大高度，使文本框更长 */
+            max-height: 600px; /* 从400px增加到600px */
             overflow-y: auto;
             display: none;
             position: relative;
             z-index: 20;
+            /* 优化移动端滚动 */
+            -webkit-overflow-scrolling: touch;
         }
         
         .statement-display.active {
@@ -335,9 +341,12 @@
             text-shadow: 0 0 5px rgba(255, 221, 153, 0.5);
             padding: 20px;
             font-family: 'Ma Shan Zheng', cursive;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap; /* 保留换行符但允许自动换行 */
         }
         
-        /* 响应式设计 */
+        /* 响应式设计 - 优化移动端 */
         @media (max-width: 1200px) {
             .dialogue-text {
                 font-size: 3.5rem;
@@ -353,10 +362,15 @@
             
             .new-year-text {
                 font-size: 13vw;
+                white-space: nowrap; /* 确保不换行 */
             }
             
             .statement-content {
                 font-size: 1.8rem;
+            }
+            
+            .statement-display {
+                max-height: 500px; /* 从350px增加到500px */
             }
         }
         
@@ -375,11 +389,17 @@
             
             .new-year-text {
                 font-size: 14vw;
+                white-space: nowrap; /* 确保不换行 */
             }
             
             .statement-content {
                 font-size: 1.6rem;
                 padding: 15px;
+            }
+            
+            .statement-display {
+                max-height: 450px; /* 从300px增加到450px */
+                padding: 30px;
             }
         }
         
@@ -419,27 +439,38 @@
                 gap: 15px;
             }
             
+            /* 移动端优化：确保"元旦快乐！"在一行显示 */
+            .greeting-container {
+                white-space: nowrap;
+                overflow: visible;
+                padding: 0 10px;
+            }
+            
             .friend-name {
                 font-size: 13vw;
                 margin-bottom: 5px;
-                white-space: normal;
+                white-space: nowrap;
                 line-height: 1;
             }
             
             .new-year-text {
                 font-size: 15vw;
                 line-height: 0.9;
+                white-space: nowrap; /* 强制不换行 */
+                display: inline;
+                word-break: keep-all; /* 防止断字 */
             }
             
             .statement-display {
                 padding: 30px 20px;
                 margin-top: 30px;
-                max-height: 350px;
+                max-height: 400px; /* 从250px增加到400px，使文本框更长 */
             }
             
             .statement-content {
                 font-size: 1.5rem;
                 padding: 10px;
+                line-height: 1.6;
             }
         }
         
@@ -466,6 +497,12 @@
                 flex-direction: column;
             }
             
+            /* 进一步优化小屏幕下的显示 */
+            .greeting-container {
+                transform: translate(-50%, -50%) scale(0.9);
+                width: 95%;
+            }
+            
             .friend-name {
                 font-size: 15vw;
                 margin-bottom: 0;
@@ -473,12 +510,14 @@
             
             .new-year-text {
                 font-size: 17vw;
+                white-space: nowrap;
+                letter-spacing: -0.5px; /* 稍微收紧字母间距 */
             }
             
             .statement-display {
                 padding: 20px 15px;
                 margin-top: 20px;
-                max-height: 300px;
+                max-height: 350px; /* 从200px增加到350px，使文本框更长 */
             }
             
             .statement-content {
@@ -492,35 +531,75 @@
                 font-size: 5rem;
             }
             
+            /* 优化超小屏幕显示 */
+            .greeting-container {
+                transform: translate(-50%, -50%) scale(0.85);
+            }
+            
+            .friend-name {
+                font-size: 16vw;
+            }
+            
+            .new-year-text {
+                font-size: 18vw;
+                white-space: nowrap;
+                letter-spacing: -1px;
+            }
+            
+            .statement-display {
+                padding: 15px 10px;
+                max-height: 300px; /* 从180px增加到300px，使文本框更长 */
+                margin-top: 15px;
+            }
+            
+            .statement-content {
+                font-size: 1.2rem;
+                line-height: 1.5;
+            }
+        }
+        
+        @media (max-width: 380px) {
             .friend-name {
                 font-size: 17vw;
             }
             
             .new-year-text {
                 font-size: 19vw;
-            }
-            
-            .statement-display {
-                padding: 15px 10px;
-                max-height: 250px;
-            }
-            
-            .statement-content {
-                font-size: 1.2rem;
-            }
-        }
-        
-        @media (max-width: 380px) {
-            .friend-name {
-                font-size: 19vw;
-            }
-            
-            .new-year-text {
-                font-size: 21vw;
+                white-space: nowrap;
             }
             
             .greeting-container {
-                padding: 0 10px;
+                padding: 0 5px;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            
+            .statement-display {
+                max-height: 280px; /* 从160px增加到280px，使文本框更长 */
+                padding: 12px 8px;
+            }
+            
+            .statement-content {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 320px) {
+            /* 针对最小屏幕的优化 */
+            .new-year-text {
+                font-size: 20vw;
+                white-space: nowrap;
+            }
+            
+            .greeting-container {
+                transform: translate(-50%, -50%) scale(0.75);
+            }
+            
+            .statement-display {
+                max-height: 250px; /* 从140px增加到250px，使文本框更长 */
+            }
+            
+            .statement-content {
+                font-size: 1rem;
             }
         }
         
