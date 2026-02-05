@@ -788,68 +788,34 @@
     </style>
 </head>
 <body>
-    <!-- 背景音乐 -->
-        <audio id="bgMusic" loop preload="auto">
-    您的浏览器不支持音频元素
-        </audio>
-        
+    <audio id="bgMusic" loop preload="auto"></audio>
 
-        <script>
-// 加载并应用音乐配置
-        fetch('music-config.json')
-           .then(res => res.json())
-           .then(config => {
-              const audio = document.getElementById('bgMusic');
-    
+<script>
+// 加载音乐配置
+fetch('music-config.json')
+    .then(response => response.json())
+    .then(config => {
+        const audio = document.getElementById('bgMusic');
+        audio.src = config.musicUrl;
+        audio.autoplay = config.autoplay;
+        audio.loop = config.loop;
         
-        // 检查是否有正在播放的音乐状态
-              const savedMusicUrl = sessionStorage.getItem('currentMusicUrl');
-              const savedTime = sessionStorage.getItem('musicCurrentTime');
+        // 尝试播放
+        if (config.autoplay) {
+            audio.play().catch(e => {
+                console.log('需要用户交互才能播放');
+            });
+        }
         
-        // 如果音乐相同且有时间记录，恢复播放位置
-              if (savedMusicUrl === config.musicUrl && savedTime) {
-                 audio.currentTime = parseFloat(savedTime);
-              }
-        
-        // 设置音乐
-              audio.innerHTML = `<source src="${config.musicUrl}" type="audio/mpeg">`;
-              audio.autoplay = config.autoplay;
-              audio.loop = config.loop;
-              audio.load();
-        
-        // 保存当前音乐信息到sessionStorage
-              sessionStorage.setItem('currentMusicUrl', config.musicUrl);
-        
-        // 开始播放
-              if (config.autoplay) {
-                  const playPromise = audio.play();
-                  if (playPromise !== undefined) {
-                      playPromise.catch(() => {
-                         console.log('自动播放被阻止');
-                      });
-                  }
-              }
-        
-        // 定期保存播放进度
-              setInterval(() => {
-                 if (!audio.paused) {
-                     sessionStorage.setItem('musicCurrentTime', audio.currentTime);
-                 }
-              }, 1000);
-        
-        // 页面卸载前保存当前播放时间
-              window.addEventListener('beforeunload', () => {
-                 sessionStorage.setItem('musicCurrentTime', audio.currentTime);
-              });
-           })
-           .catch(error => {
-              console.error('加载音乐配置失败:', error);
-        // 使用默认音乐
-              const audio = document.getElementById('bgMusic');
-              audio.innerHTML = '<source src="https://music.163.com/song/media/outer/url?id=1413464902.mp3" type="audio/mpeg">';
-              audio.load();
-              audio.play();
-           });
+        console.log('音乐已加载:', config.musicUrl);
+    })
+    .catch(error => {
+        console.log('使用默认音乐');
+        const audio = document.getElementById('bgMusic');
+        audio.src = 'https://music.163.com/song/media/outer/url?id=1413464902.mp3';
+        audio.play();
+    });
+
     <!-- 第一页：对话页面 -->
     <div id="page1" class="page">
         <div class="container">
