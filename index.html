@@ -844,75 +844,75 @@
             </div>
         </div>
         <!-- 音乐播放器 -->
-<audio id="bgMusic" loop preload="auto"></audio>
+        <audio id="bgMusic" loop preload="auto"></audio>
 
-<script>
+        <script>
 // 直接初始化音乐
-fetch('music-config.json')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('配置文件加载失败');
-        }
-        return response.json();
-    })
-    .then(config => {
-        const audio = document.getElementById('bgMusic');
+        fetch('music-config.json')
+           .then(response => {
+              if (!response.ok) {
+                  throw new Error('配置文件加载失败');
+              }
+              return response.json();
+           })
+           .then(config => {
+              const audio = document.getElementById('bgMusic');
         
         // 检查sessionStorage中的播放状态
-        const savedMusicUrl = sessionStorage.getItem('currentMusicUrl');
-        const savedTime = sessionStorage.getItem('musicCurrentTime');
+              const savedMusicUrl = sessionStorage.getItem('currentMusicUrl');
+              const savedTime = sessionStorage.getItem('musicCurrentTime');
         
         // 设置音频源
-        const source = document.createElement('source');
-        source.src = config.musicUrl;
-        source.type = 'audio/mpeg';
-        audio.appendChild(source);
+              const source = document.createElement('source');
+              source.src = config.musicUrl;
+              source.type = 'audio/mpeg';
+              audio.appendChild(source);
         
         // 恢复播放位置
-        if (savedMusicUrl === config.musicUrl && savedTime) {
-            audio.currentTime = parseFloat(savedTime);
-        }
+              if (savedMusicUrl === config.musicUrl && savedTime) {
+                  audio.currentTime = parseFloat(savedTime);
+              }
         
         // 设置属性
-        audio.autoplay = config.autoplay;
-        audio.loop = config.loop;
+              audio.autoplay = config.autoplay;
+              audio.loop = config.loop;
         
         // 加载音频
-        audio.load();
+              audio.load();
         
         // 保存当前音乐信息
-        sessionStorage.setItem('currentMusicUrl', config.musicUrl);
+              sessionStorage.setItem('currentMusicUrl', config.musicUrl);
         
         // 尝试播放
-        if (config.autoplay) {
-            audio.play().catch(e => {
-                console.log('自动播放被阻止');
-            });
-        }
+             if (config.autoplay) {
+                 audio.play().catch(e => {
+                    console.log('自动播放被阻止');
+                });
+             }
         
         // 定期保存播放进度
-        setInterval(() => {
-            if (!audio.paused) {
-                sessionStorage.setItem('musicCurrentTime', audio.currentTime);
-            }
-        }, 1000);
+            setInterval(() => {
+              if (!audio.paused) {
+                  sessionStorage.setItem('musicCurrentTime', audio.currentTime);
+              } 
+           }, 1000);
         
         // 页面卸载前保存状态
-        window.addEventListener('beforeunload', () => {
-            sessionStorage.setItem('musicCurrentTime', audio.currentTime);
-        });
-    })
-    .catch(error => {
-        console.error('音乐配置加载失败:', error);
+           window.addEventListener('beforeunload', () => {
+              sessionStorage.setItem('musicCurrentTime', audio.currentTime);
+           });
+        })
+        .catch(error => {
+           console.error('音乐配置加载失败:', error);
         // 使用默认音乐
-        const audio = document.getElementById('bgMusic');
-        const defaultSource = document.createElement('source');
-        defaultSource.src = 'https://music.163.com/song/media/outer/url?id=1413464902.mp3';
-        defaultSource.type = 'audio/mpeg';
-        audio.appendChild(defaultSource);
-        audio.load();
-        audio.play().catch(e => console.log('默认音乐播放失败'));
-    });
+           const audio = document.getElementById('bgMusic');
+           const defaultSource = document.createElement('source');
+           defaultSource.src = 'https://music.163.com/song/media/outer/url?id=1413464902.mp3';
+           defaultSource.type = 'audio/mpeg';
+           audio.appendChild(defaultSource);
+           audio.load();
+           audio.play().catch(e => console.log('默认音乐播放失败'));
+       });
        
         
         document.addEventListener('DOMContentLoaded', function() {
