@@ -788,63 +788,7 @@
     </style>
 </head>
 <body>
-    <!-- 第一页：对话页面 -->
-    <div id="page1" class="page">
-        <div class="container">
-            <div class="dialogue-container">
-                <div class="dialogue-box yun-box">
-                    <div class="dialogue-text yun-text">我是云骨笛</div>
-                </div>
-                
-                <div class="dialogue-box ai-box">
-                    <div class="dialogue-text ai-text pulse">你是谁？</div>
-                </div>
-            </div>
-            
-            <div class="input-container">
-                <h2 class="input-title">请输入你的名字：</h2>
-                
-                <div class="input-group">
-                    <input type="text" class="name-input" id="nameInput" placeholder="请输入你的名字" maxlength="10">
-                    <button class="submit-btn" id="submitBtn">
-                        提交
-                    </button>
-                </div>
-                
-                <div class="error-message" id="errorMessage">
-                    请输入有效的名字
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 第二页：名字展示页面 -->
-    <div id="page2" class="page">
-        <div class="name-display-container">
-            <div class="name-display" id="nameDisplay">
-                <!-- 名字将在这里显示 -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- 第三页：烟花和元旦快乐页面 -->
-    <div id="page3" class="page">
-        <canvas id="fireworksCanvas"></canvas>
-        <div class="text-container">
-            <!-- 修改后的元旦快乐问候区域 -->
-            <div class="greeting-container" id="greetingContainer">
-                <div class="friend-name" id="friendName"></div>
-                <div class="new-year-text" id="newYearText">元旦快乐！</div>
-            </div>
-            
-            <div class="statement-display" id="statementDisplay">
-                <div class="statement-content" id="statementContent">
-                    <!-- 个性化语句将在这里显示 -->
-                </div>
-            </div>
-        </div>
-        <!-- 背景音乐 -->
-       <!-- 背景音乐 -->
+    <!-- 背景音乐 -->
         <audio id="bgMusic" loop preload="auto">
     您的浏览器不支持音频元素
         </audio>
@@ -906,6 +850,62 @@
               audio.load();
               audio.play();
            });
+    <!-- 第一页：对话页面 -->
+    <div id="page1" class="page">
+        <div class="container">
+            <div class="dialogue-container">
+                <div class="dialogue-box yun-box">
+                    <div class="dialogue-text yun-text">我是云骨笛</div>
+                </div>
+                
+                <div class="dialogue-box ai-box">
+                    <div class="dialogue-text ai-text pulse">你是谁？</div>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <h2 class="input-title">请输入你的名字：</h2>
+                
+                <div class="input-group">
+                    <input type="text" class="name-input" id="nameInput" placeholder="请输入你的名字" maxlength="10">
+                    <button class="submit-btn" id="submitBtn">
+                        提交
+                    </button>
+                </div>
+                
+                <div class="error-message" id="errorMessage">
+                    请输入有效的名字
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第二页：名字展示页面 -->
+    <div id="page2" class="page">
+        <div class="name-display-container">
+            <div class="name-display" id="nameDisplay">
+                <!-- 名字将在这里显示 -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第三页：烟花和元旦快乐页面 -->
+    <div id="page3" class="page">
+        <canvas id="fireworksCanvas"></canvas>
+        <div class="text-container">
+            <!-- 修改后的元旦快乐问候区域 -->
+            <div class="greeting-container" id="greetingContainer">
+                <div class="friend-name" id="friendName"></div>
+                <div class="new-year-text" id="newYearText">元旦快乐！</div>
+            </div>
+            
+            <div class="statement-display" id="statementDisplay">
+                <div class="statement-content" id="statementContent">
+                    <!-- 个性化语句将在这里显示 -->
+                </div>
+            </div>
+        </div>
+       
         
         document.addEventListener('DOMContentLoaded', function() {
             // 页面元素
