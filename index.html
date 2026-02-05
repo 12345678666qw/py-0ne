@@ -844,13 +844,24 @@
             </div>
         </div>
         <!-- 背景音乐 -->
+       <!-- 背景音乐 -->
         <audio id="bgMusic" loop preload="auto">
-            <source src="http://music.163.com/song/media/outer/url?id=1820478232.mp3" type="audio/mpeg">
-            您的浏览器不支持音频元素
+    您的浏览器不支持音频元素
         </audio>
-    </div>
+        </div>
 
-    <script>
+        <script>
+// 加载并应用音乐配置
+        fetch('music-config.json')
+           .then(res => res.json())
+           .then(config => {
+              const audio = document.getElementById('bgMusic');
+              audio.innerHTML = `<source src="${config.musicUrl}" type="audio/mpeg">`;
+              audio.autoplay = config.autoplay;
+              audio.loop = config.loop;
+              audio.load();
+           });
+        </script>
         document.addEventListener('DOMContentLoaded', function() {
             // 页面元素
             const page1 = document.getElementById('page1');
