@@ -904,15 +904,7 @@
         })
         .catch(error => {
            console.error('音乐配置加载失败:', error);
-        // 使用默认音乐
-           const audio = document.getElementById('bgMusic');
-           const defaultSource = document.createElement('source');
-           defaultSource.src = 'https://music.163.com/song/media/outer/url?id=1413464902.mp3';
-           defaultSource.type = 'audio/mpeg';
-           audio.appendChild(defaultSource);
-           audio.load();
-           audio.play().catch(e => console.log('默认音乐播放失败'));
-       });
+        
        
         
         document.addEventListener('DOMContentLoaded', function() {
