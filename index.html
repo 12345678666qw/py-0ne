@@ -846,35 +846,38 @@
         <!-- 音乐播放器 -->
         <audio id="bgMusic" loop preload="auto"></audio>
 
-        <script>
-// 使用sessionStorage确保每个浏览器会话只初始化一次
-        if (!sessionStorage.getItem('music_initialized')) {
-            console.log('🔄 首次初始化音乐');
+        <script>    
+// 全局标记方案
+        if (!window.__music_initialized__) {
+            window.__music_initialized__ = true;
+    
+            console.log('初始化音乐...');
     
             const audio = document.getElementById('bgMusic');
     
+    // 如果audio已有src，说明已经被初始化过（保险检查）
+        if (!audio.src || audio.src === '') {
             fetch('music-config.json')
                .then(response => response.json())
                .then(config => {
                   audio.src = config.musicUrl;
                   audio.autoplay = config.autoplay;
                   audio.loop = config.loop;
-            
-            // 标记为已初始化（这个会话中不再初始化）
-                  sessionStorage.setItem('music_initialized', 'true');
-            
-            // 监听页面卸载，清除标记（可选）
-                  window.addEventListener('beforeunload', () => {
-                     sessionStorage.removeItem('music_initialized');
+                
+                  audio.play().catch(e => {
+                     console.log('自动播放被阻止');
                   });
+                
+                  console.log('音乐设置完成');
                })
                .catch(error => {
-                  console.error('加载失败:', error);
+                  console.error('使用默认音乐:', error);
                   audio.src = 'https://music.163.com/song/media/outer/url?id=1413464902.mp3';
                   audio.autoplay = true;
                   audio.loop = true;
-                  sessionStorage.setItem('music_initialized', 'true');
-               });
+                  audio.play();
+              });
+           }
         } else {
            console.log('⏭️ 音乐已在此会话中初始化过，跳过');
         }
